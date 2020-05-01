@@ -161,6 +161,7 @@ def build_mms_with_quote(contact_name, date, contact_name_quote, css, quote="", 
         </div>
 	{msg}
         </div>
+      </section>
   """.format(contact_name = contact_name, date = date, msg = msg, contact_name_quote = contact_name_quote, quote = quote, css = css, offset = offset)
   return row
 
@@ -182,6 +183,7 @@ def build_mms_with_quote_and_img(contact_name, date, contact_name_quote, css, im
         </div>
 	{msg}
         </div>
+      </section>
   """.format(contact_name = contact_name, date = date, msg = msg, contact_name_quote = contact_name_quote, quote = quote, css = css, img_path = img_path, offset = offset)
   return row
 
@@ -206,6 +208,10 @@ html_result.write(build_mms_with_img('Florian', '01/01/1970', '20200315_120238.j
 
 html_result.write(build_mms_with_quote('Gabrielle', '01/01/1970', 'Florian', 'gabrielle', quote="Je t'aime", msg="Je t'aime", offset="offset-md-5"))
 html_result.write(build_mms_with_quote('Florian', '01/01/1970', 'Gabrielle', 'florian', quote="Je t'aime", msg="Je t'aime"))
+
+html_result.write(build_mms_with_quote_and_img('Gabrielle', '01/01/1970', 'Florian', 'gabrielle', '20200315_120238.jpg', quote="Je t'aime", msg="Je t'aime", offset="offset-md-5"))
+html_result.write(build_mms_with_quote_and_img('Florian', '01/01/1970', 'Gabrielle', 'florian', '20200315_120238.jpg', quote="Je t'aime", msg="Je t'aime"))
+
 
 html_result.write(build_footer())
 
