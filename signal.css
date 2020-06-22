@@ -11,35 +11,35 @@ font: 22px Baskerville, "Palatino Linotype", "Times New Roman", Times, serif;
 text-align: left;
 }
 
-.col-md-6.msg_gabrielle{
+.col-md-6.msg_mycontact{
   background-color: #e9e9e9;
   border: 2px solid #e9e9e9;
   line-height: 40px;
   color: black;
 }
 
-.col-md-6.msg_florian{
+.col-md-6.msg_myself{
   background-color: #3c7845;
   border: 2px solid #3c7845;
   line-height: 40px;
   color: white;
 }
 
-.col-md-12.quote_gabrielle{
+.col-md-12.quote_mycontact{
   background-color: #a5bca8;
   border: 2px solid #a5bca8;
   line-height: 40px;
   color: black;
 }
 
-.col-md-12.quote_florian{
+.col-md-12.quote_myself{
   background-color: #b2c9b5;
   border: 2px solid #b2c9b5;
   line-height: 40px;
   color: black;
 }
 
-.col-md-12.name_gabrielle{
+.col-md-12.name_mycontact{
   background-color: #a5bca8;
   border: 2px solid #a5bca8;
   line-height: 40px;
@@ -47,7 +47,7 @@ text-align: left;
   color: black;
 }
 
-.col-md-12.name_florian{
+.col-md-12.name_myself{
   background-color: #b2c9b5;
   border: 2px solid #b2c9b5;
   line-height: 40px;
