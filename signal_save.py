@@ -4,16 +4,23 @@
 import sqlite3
 from functools import total_ordering
 from pdb import pm
+from datetime import datetime
 
 conn = sqlite3.connect('signal_backup.db')
 db_cursor = conn.cursor()
 
 contact_address = 15
+CONTACT_NAME = 'Etienne'
+MYSELF = 'Florian'
+
+SMS_SENT = 10485783
+SMS_REC = 10485780
 
 @total_ordering
 class MMS(object):
-  def __init__(self, date, body, part_count, quote_id, quote_body, reactions):
+  def __init__(self, date, mms_type, body, part_count, quote_id, quote_body, reactions):
     self.date = date
+    self.mms_type = mms_type
     self.body = body 
     self.part_count = part_count
     self.quote_id = quote_id
@@ -21,7 +28,7 @@ class MMS(object):
     self.reactions = reactions
 
   def __str__(self):
-    return "date : {}, body : {}, part_count : {}, quote_id : {}, quote_body : {}, reactions : {}\n".format(self.date, self.body, self.part_count, self.quote_id, self.quote_body, self.reactions)
+    return self.__repr__()
 
   def __eq__(self, other):
     return ((self.date,self.body) == (other.date,other.body))
@@ -33,19 +40,20 @@ class MMS(object):
     return (self.date < other.date)
   
   def __repr__(self):
-    return "date : {}, body : {}, part_count : {}, quote_id : {}, quote_body : {}, reactions : {}\n".format(self.date, self.body, self.part_count, self.quote_id, self.quote_body, self.reactions)
+    return "date : {}, type : {}, body : {}, part_count : {}, quote_id : {}, quote_body : {}, reactions : {}\n".format(self.date, self.mms_type, self.body, self.part_count, self.quote_id, self.quote_body, self.reactions)
 
 @total_ordering
 class SMS(object):
-  def __init__(self, thread_id, address, date, body, reactions):
+  def __init__(self, thread_id, address, date, sms_type, body, reactions):
     self.date = date
     self.body = body 
+    self.sms_type = sms_type
     self.thread_id = thread_id
     self.address = address
     self.reactions = reactions
 
   def __str__(self):
-    return "date : {}, body : {}, thread_id : {}, address : {}, reactions : {}\n".format(self.date, self.body, self.thread_id, self.address, self.reactions)
+    return self.__repr__()
 
   def __eq__(self, other):
     return ((self.date,self.body) == (other.date,other.body))
@@ -57,7 +65,7 @@ class SMS(object):
     return (self.date < other.date)
   
   def __repr__(self):
-    return "date : {}, body : {}, thread_id : {}, address : {}, reactions : {}\n".format(self.date, self.body, self.thread_id, self.address, self.reactions)
+    return "date : {}, type : {}, body : {}, thread_id : {}, address : {}, reactions : {}\n".format(self.date, self.sms_type, self.body, self.thread_id, self.address, self.reactions)
 
 class PART(object):
   def __init__(self, id_part, ct, unique_id, width, height):
@@ -76,15 +84,15 @@ class PART(object):
 
 def fetch_contact_msg(contact_address, db_cursor):
   # MMS
-  db_cursor.execute("select date,body,part_count,quote_id,quote_body,reactions FROM MMS where address=={}".format(contact_address))
+  db_cursor.execute("select date,msg_box,body,part_count,quote_id,quote_body,reactions FROM MMS where address=={}".format(contact_address))
   mms = []
   for m in db_cursor.fetchall():
-    mms.append(MMS(m[0],m[1],m[2],m[3],m[4],m[5]))
+    mms.append(MMS(m[0],m[1],m[2],m[3],m[4],m[5],m[6]))
   
-  db_cursor.execute("select thread_id, address, date, body, reactions FROM sms where address=={}".format(contact_address))
+  db_cursor.execute("select thread_id, address, date, type, body, reactions FROM sms where address=={}".format(contact_address))
   sms = []
   for s in db_cursor.fetchall():
-    sms.append(SMS(s[0],s[1],s[2],s[3],s[4]))
+    sms.append(SMS(s[0],s[1],s[2],s[3],s[4],s[5]))
 
   return mms, sms
   
@@ -117,7 +125,15 @@ def build_header():
   """
   return head + navbar
 
-def build_sms(contact_name, date, css , msg="", offset=""):
+def build_sms(contact_name, date, css="mycontact" , msg="", offset=""):
+  if contact_name == CONTACT_NAME:
+    offset = "offset-md-5"
+    css = "mycontact"
+  elif contact_name == MYSELF:
+    css = "myself"
+  else:
+    raise ValueError
+
   row = """
         <section class="row">
           <div class="col-md-6 msg_{css} {offset}">
@@ -130,7 +146,15 @@ def build_sms(contact_name, date, css , msg="", offset=""):
   """.format(contact_name = contact_name, date = date, msg = msg, css = css, offset = offset)
   return row
 
-def build_mms_with_img(contact_name, date, img_path, css, msg="", offset=""):
+def build_mms_with_img(contact_name, date, img_path, css="mycontact", msg="", offset=""):
+  if contact_name == CONTACT_NAME:
+      offset = "offset-md-5"
+      css = "mycontact"
+  elif contact_name == MYSELF:
+    css = "myself"
+  else:
+    raise ValueError
+
   row = """
       <section class="row">
         <div class="col-md-6 msg_{css} {offset}">
@@ -146,7 +170,15 @@ def build_mms_with_img(contact_name, date, img_path, css, msg="", offset=""):
   """.format(contact_name = contact_name, date = date, msg = msg, img_path = img_path, css = css, offset = offset)
   return row
 
-def build_mms_with_quote(contact_name, date, contact_name_quote, css, quote="", msg="", offset=""):
+def build_mms_with_quote(contact_name, date, contact_name_quote, css="mycontact", quote="", msg="", offset=""):
+  if contact_name == CONTACT_NAME:
+      offset = "offset-md-5"
+      css = "mycontact"
+  elif contact_name == MYSELF:
+    css = "myself"
+  else:
+    raise ValueError
+
   row = """
       <section class="row">
         <div class="col-md-6 msg_{css} {offset}">
@@ -165,7 +197,15 @@ def build_mms_with_quote(contact_name, date, contact_name_quote, css, quote="", 
   """.format(contact_name = contact_name, date = date, msg = msg, contact_name_quote = contact_name_quote, quote = quote, css = css, offset = offset)
   return row
 
-def build_mms_with_quote_and_img(contact_name, date, contact_name_quote, css, img_path, quote="", msg="", offset=""):
+def build_mms_with_quote_and_img(contact_name, date, contact_name_quote, img_path, css="mycontact", quote="", msg="", offset=""):
+  if contact_name == CONTACT_NAME:
+        offset = "offset-md-5"
+        css = "mycontact"
+  elif contact_name == MYSELF:
+    css = "myself"
+  else:
+    raise ValueError
+
   row = """
       <section class="row">
         <div class="col-md-6 msg_{css} {offset}">
@@ -193,26 +233,72 @@ def build_footer():
   </html>
   """
 
-#mms, sms = fetch_contact_msg(contact_address, db_cursor)
-#part = fetch_part(db_cursor)
-#print(sms)
+mms, sms = fetch_contact_msg(contact_address, db_cursor)
+part = fetch_part(db_cursor)
+print(mms)
+#print(part)
 
-html_result = open('gabrielle.html','a')
+### TEST ###
+html_result = open('gabrielle.html','w')
 html_result.write(build_header())
 
-html_result.write(build_sms('Gabrielle', '01/01/1970', 'gabrielle', msg="Je t'aime", offset = "offset-md-5"))
-html_result.write(build_sms('Florian', '01/01/1970', 'florian', msg="Je t'aime"))
+html_result.write(build_sms(CONTACT_NAME, '01/01/1970', msg="Je t'aime"))
+html_result.write(build_sms(MYSELF, '01/01/1970', msg="Je t'aime"))
 
-html_result.write(build_mms_with_img('Gabrielle', '01/01/1970', '20200315_120238.jpg', 'gabrielle', msg="Je t'aime", offset = "offset-md-5"))
-html_result.write(build_mms_with_img('Florian', '01/01/1970', '20200315_120238.jpg', 'florian', msg="Je t'aime"))
+html_result.write(build_mms_with_img(CONTACT_NAME, '01/01/1970', '20200315_120238.jpg', msg="Je t'aime"))
+html_result.write(build_mms_with_img(MYSELF, '01/01/1970', '20200315_120238.jpg', msg="Je t'aime"))
 
-html_result.write(build_mms_with_quote('Gabrielle', '01/01/1970', 'Florian', 'gabrielle', quote="Je t'aime", msg="Je t'aime", offset="offset-md-5"))
-html_result.write(build_mms_with_quote('Florian', '01/01/1970', 'Gabrielle', 'florian', quote="Je t'aime", msg="Je t'aime"))
+html_result.write(build_mms_with_quote(CONTACT_NAME, '01/01/1970', MYSELF, quote="Je t'aime", msg="Je t'aime",))
+html_result.write(build_mms_with_quote(MYSELF, '01/01/1970', CONTACT_NAME, quote="Je t'aime", msg="Je t'aime"))
 
-html_result.write(build_mms_with_quote_and_img('Gabrielle', '01/01/1970', 'Florian', 'gabrielle', '20200315_120238.jpg', quote="Je t'aime", msg="Je t'aime", offset="offset-md-5"))
-html_result.write(build_mms_with_quote_and_img('Florian', '01/01/1970', 'Gabrielle', 'florian', '20200315_120238.jpg', quote="Je t'aime", msg="Je t'aime"))
+html_result.write(build_mms_with_quote_and_img(CONTACT_NAME, '01/01/1970', MYSELF, '20200315_120238.jpg', quote="Je t'aime", msg="Je t'aime"))
+html_result.write(build_mms_with_quote_and_img(MYSELF, '01/01/1970', CONTACT_NAME, '20200315_120238.jpg', quote="Je t'aime", msg="Je t'aime"))
+
+html_result.write(build_footer())
+html_result.close()
+
+### TEST2 ###
+
+html_result = open('test.html','w')
+html_result.write(build_header())
+
+for smsi in sms:
+  sms_date = datetime.fromtimestamp(smsi.date//1000)
+  if smsi.sms_type == SMS_REC:
+    html_result.write(build_sms(CONTACT_NAME, sms_date, msg=smsi.body))
+  elif smsi.mms_type == SMS_SENT:
+    html_result.write(build_sms(MYSELF, sms_date, msg=smsi.body))
+  else:
+    raise ValueError
+
+# MMS
+# self.date = date
+# self.body = body 
+# self.part_count = part_count
+# self.quote_id = quote_id
+# self.quote_body = quote_body
+# self.reactions = reactions
+
+for mmsi in mms:
+  mms_date = datetime.fromtimestamp(mmsi.date//1000)
+  if smsi.mms_type == SMS_REC:
+    html_result.write(build_sms(CONTACT_NAME, sms_date, msg=smsi.body))
+  elif smsi.mms_type == SMS_SENT:
+    html_result.write(build_sms(MYSELF, sms_date, msg=smsi.body))
+  else:
+    raise ValueError
+
+html_result.write(build_mms_with_img(CONTACT_NAME, '01/01/1970', '20200315_120238.jpg', msg="Je t'aime"))
+html_result.write(build_mms_with_img(MYSELF, '01/01/1970', '20200315_120238.jpg', msg="Je t'aime"))
+
+#html_result.write(build_mms_with_quote(CONTACT_NAME, '01/01/1970', MYSELF, quote="Je t'aime", msg="Je t'aime",))
+#html_result.write(build_mms_with_quote(MYSELF, '01/01/1970', CONTACT_NAME, quote="Je t'aime", msg="Je t'aime"))
+#html_result.write(build_mms_with_quote_and_img(CONTACT_NAME, '01/01/1970', MYSELF, '20200315_120238.jpg', quote="Je t'aime", msg="Je t'aime"))
+#html_result.write(build_mms_with_quote_and_img(MYSELF, '01/01/1970', CONTACT_NAME, '20200315_120238.jpg', quote="Je t'aime", msg="Je t'aime"))
+
 
 
 html_result.write(build_footer())
-
 html_result.close()
+
+
