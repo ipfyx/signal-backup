@@ -5,21 +5,23 @@ import sqlite3
 from functools import total_ordering
 from pdb import pm
 from datetime import datetime
+from collections import OrderedDict
 
 conn = sqlite3.connect('signal_backup.db')
 db_cursor = conn.cursor()
 
 THREAD_ID = 25
-contact_address = 102
+CONTACT_ADDRESS = 102
 CONTACT_NAME = 'Gabrielle'
 MYSELF = 'Florian'
+PATH_ATTACHMENTS = './attachment/'
 
 SMS_SENT = 10485783
 SMS_REC = 10485780
 
 @total_ordering
 class MMS(object):
-  def __init__(self, date, mms_type, body, part_count, quote_id, quote_body, reactions):
+  def __init__(self, date, mms_type, body, part_count, quote_id, quote_body, reactions, mms_id, part_ct, part_unique_id, part_width, part_height):
     self.date = date
     self.mms_type = mms_type
     self.body = body 
@@ -27,6 +29,17 @@ class MMS(object):
     self.quote_id = quote_id
     self.quote_body = quote_body
     self.reactions = reactions
+
+    #self.mms_id = mms_id
+    #self.part_unique_id = part_unique_id
+    self.part_ct = part_ct
+    self.part_width = part_width
+    self.part_height = part_height
+    if part_unique_id is not None:
+      assert(mms_id is not None)
+      self.filename = str(part_unique_id) + "_" + str(mms_id)
+    else:
+      self.filename = None
 
   def __str__(self):
     return self.__repr__()
@@ -41,7 +54,7 @@ class MMS(object):
     return (self.date < other.date)
   
   def __repr__(self):
-    return "date : {}, type : {}, body : {}, part_count : {}, quote_id : {}, quote_body : {}, reactions : {}\n".format(self.date, self.mms_type, self.body, self.part_count, self.quote_id, self.quote_body, self.reactions)
+    return "date : {}, type : {}, body : {}, part_count : {}, quote_id : {}, quote_body : {}, reactions : {}, file : {}, ct : {},  width : {}, heigth : {}\n".format(self.date, self.mms_type, self.body, self.part_count, self.quote_id, self.quote_body, self.reactions, self.filename, self.part_ct, self.part_width, self.part_height)
 
 @total_ordering
 class SMS(object):
@@ -87,16 +100,17 @@ def fetch_contact_msg(contact_address, db_cursor):
   # MMS
   #db_cursor.execute("select date,msg_box,body,part_count,quote_id,quote_body,reactions FROM MMS where thread_id=={}".format(thread_id))
   db_cursor.execute("select date, msg_box, body, part_count, quote_id, quote_body, reactions, part._id, part.ct, part.unique_id, part.width, part.height FROM MMS LEFT JOIN part ON part.mid = MMS._id WHERE thread_id={}".format(THREAD_ID))
-  mms = []
+  msg = OrderedDict()
   for m in db_cursor.fetchall():
-    mms.append(MMS(m[0],m[1],m[2],m[3],m[4],m[5],m[6]))
-  
-  db_cursor.execute("select thread_id, address, date, type, body, reactions FROM sms where thread_id=={}".format(THREAD_ID))
-  sms = []
-  for s in db_cursor.fetchall():
-    sms.append(SMS(s[0],s[1],s[2],s[3],s[4],s[5]))
+    msg[m[0]] = MMS(m[0],m[1],m[2],m[3],m[4],m[5],m[6],m[7],m[8],m[9],m[10],m[11])
 
-  return mms, sms
+  db_cursor.execute("select thread_id, address, date, type, body, reactions FROM sms where thread_id=={}".format(THREAD_ID))
+  for s in db_cursor.fetchall():
+    if msg.get(s[2]):
+      raise ValueError
+    msg[s[2]] = SMS(s[0],s[1],s[2],s[3],s[4],s[5])
+
+  return msg
   
 def fetch_part(db_cursor):
   db_cursor.execute("select _id, ct, unique_id, width, height FROM part")
@@ -235,10 +249,7 @@ def build_footer():
   </html>
   """
 
-mms, sms = fetch_contact_msg(contact_address, db_cursor)
-part = fetch_part(db_cursor)
-print(mms)
-#print(part)
+msg = OrderedDict(sorted(fetch_contact_msg(CONTACT_ADDRESS, db_cursor).items()))
 
 ### TEST ###
 html_result = open('gabrielle.html','w')
@@ -284,19 +295,53 @@ html_result.write(build_header())
 # self.quote_body = quote_body
 # self.reactions = reactions
 
-for mmsi in mms:
-  mms_date = datetime.fromtimestamp(mmsi.date//1000)
-  if mmsi.mms_type == SMS_REC:
-    if mmsi.part_count == 1:
-      #assert(mmsi.quote_id > 0)
-      print(mmsi.quote_id)
-      html_result.write(build_mms_with_img(CONTACT_NAME, mms_date, 'file', msg=mmsi.body))
+lim = 0
+for msg_date, msgi in msg.items():
+  #lim += 1
+  #if lim > 2000:
+  #  break
 
-  elif mmsi.mms_type == SMS_SENT:
-    pass
+  mms_date = datetime.fromtimestamp(msgi.date//1000)
+
+  if isinstance(msgi ,SMS):
+    if msgi.sms_type == SMS_REC:
+      html_result.write(build_sms(CONTACT_NAME, mms_date, msg=msgi.body))
+    elif msgi.sms_type == SMS_SENT:
+      html_result.write(build_sms(MYSELF, mms_date, msg=msgi.body))
+    else:
+      print(msgi)
+
   else:
-    print(mmsi)
-    #raise ValueError
+
+    if msgi.mms_type == SMS_REC:
+      if msgi.quote_id > 0:
+        quoted_mms = msg.get(msgi.quote_id)
+        if quoted_mms is MMS and quoted_mms.filename is not None:
+          html_result.write(build_mms_with_quote_and_img(CONTACT_NAME, mms_date, MYSELF, PATH_ATTACHMENTS + quoted_mms.filename, quote= msgi.quote_body, msg=msgi.body))
+        else:
+          html_result.write(build_mms_with_quote(CONTACT_NAME, mms_date, MYSELF, quote=msgi.quote_body, msg=msgi.body,))
+
+      elif msgi.filename is not None:
+        html_result.write(build_mms_with_img(CONTACT_NAME, mms_date, PATH_ATTACHMENTS + msgi.filename, msg=msgi.body))
+      else:
+        raise ValueError
+
+    elif msgi.mms_type == SMS_SENT:
+      if msgi.quote_id > 0:
+        quoted_mms = msg.get(msgi.quote_id)
+        if quoted_mms and quoted_mms.filename is not None:
+          html_result.write(build_mms_with_quote_and_img(MYSELF, mms_date, CONTACT_NAME, PATH_ATTACHMENTS + quoted_mms.filename, quote= msgi.quote_body, msg=msgi.body))
+        else:
+          html_result.write(build_mms_with_quote(MYSELF, mms_date, CONTACT_NAME, quote=msgi.quote_body, msg=msgi.body,))
+
+      elif msgi.filename is not None:
+        html_result.write(build_mms_with_img(MYSELF, mms_date, PATH_ATTACHMENTS + msgi.filename, msg=msgi.body))
+      else:
+        raise ValueError
+
+    else:
+      print(msgi)
+      #raise ValueError
 
 #html_result.write(build_mms_with_img(CONTACT_NAME, '01/01/1970', '20200315_120238.jpg', msg="Je t'aime"))
 #html_result.write(build_mms_with_img(MYSELF, '01/01/1970', '20200315_120238.jpg', msg="Je t'aime"))
