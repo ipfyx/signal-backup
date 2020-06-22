@@ -5,3 +5,4 @@ bootstrap-4.4.1-dist/
 config/
 signal_backup.db
 stickers/
+*.html
