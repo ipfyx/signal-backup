@@ -9,8 +9,9 @@ from datetime import datetime
 conn = sqlite3.connect('signal_backup.db')
 db_cursor = conn.cursor()
 
-contact_address = 15
-CONTACT_NAME = 'Etienne'
+THREAD_ID = 25
+contact_address = 102
+CONTACT_NAME = 'Gabrielle'
 MYSELF = 'Florian'
 
 SMS_SENT = 10485783
@@ -84,12 +85,13 @@ class PART(object):
 
 def fetch_contact_msg(contact_address, db_cursor):
   # MMS
-  db_cursor.execute("select date,msg_box,body,part_count,quote_id,quote_body,reactions FROM MMS where address=={}".format(contact_address))
+  #db_cursor.execute("select date,msg_box,body,part_count,quote_id,quote_body,reactions FROM MMS where thread_id=={}".format(thread_id))
+  db_cursor.execute("select date, msg_box, body, part_count, quote_id, quote_body, reactions, part._id, part.ct, part.unique_id, part.width, part.height FROM MMS LEFT JOIN part ON part.mid = MMS._id WHERE thread_id={}".format(THREAD_ID))
   mms = []
   for m in db_cursor.fetchall():
     mms.append(MMS(m[0],m[1],m[2],m[3],m[4],m[5],m[6]))
   
-  db_cursor.execute("select thread_id, address, date, type, body, reactions FROM sms where address=={}".format(contact_address))
+  db_cursor.execute("select thread_id, address, date, type, body, reactions FROM sms where thread_id=={}".format(THREAD_ID))
   sms = []
   for s in db_cursor.fetchall():
     sms.append(SMS(s[0],s[1],s[2],s[3],s[4],s[5]))
@@ -262,14 +264,17 @@ html_result.close()
 html_result = open('test.html','w')
 html_result.write(build_header())
 
-for smsi in sms:
-  sms_date = datetime.fromtimestamp(smsi.date//1000)
-  if smsi.sms_type == SMS_REC:
-    html_result.write(build_sms(CONTACT_NAME, sms_date, msg=smsi.body))
-  elif smsi.mms_type == SMS_SENT:
-    html_result.write(build_sms(MYSELF, sms_date, msg=smsi.body))
-  else:
-    raise ValueError
+#for smsi in sms:
+#  sms_date = datetime.fromtimestamp(smsi.date//1000)
+#  if smsi.sms_type == SMS_REC:
+#    html_result.write(build_sms(CONTACT_NAME, sms_date, msg=smsi.body))
+#  elif smsi.sms_type == SMS_SENT:
+#    html_result.write(build_sms(MYSELF, sms_date, msg=smsi.body))
+#  elif smsi.sms_type == 2097684:
+#    pass
+#  else:
+#    print(smsi)
+#    #raise ValueError
 
 # MMS
 # self.date = date
@@ -281,15 +286,20 @@ for smsi in sms:
 
 for mmsi in mms:
   mms_date = datetime.fromtimestamp(mmsi.date//1000)
-  if smsi.mms_type == SMS_REC:
-    html_result.write(build_sms(CONTACT_NAME, sms_date, msg=smsi.body))
-  elif smsi.mms_type == SMS_SENT:
-    html_result.write(build_sms(MYSELF, sms_date, msg=smsi.body))
-  else:
-    raise ValueError
+  if mmsi.mms_type == SMS_REC:
+    if mmsi.part_count == 1:
+      #assert(mmsi.quote_id > 0)
+      print(mmsi.quote_id)
+      html_result.write(build_mms_with_img(CONTACT_NAME, mms_date, 'file', msg=mmsi.body))
 
-html_result.write(build_mms_with_img(CONTACT_NAME, '01/01/1970', '20200315_120238.jpg', msg="Je t'aime"))
-html_result.write(build_mms_with_img(MYSELF, '01/01/1970', '20200315_120238.jpg', msg="Je t'aime"))
+  elif mmsi.mms_type == SMS_SENT:
+    pass
+  else:
+    print(mmsi)
+    #raise ValueError
+
+#html_result.write(build_mms_with_img(CONTACT_NAME, '01/01/1970', '20200315_120238.jpg', msg="Je t'aime"))
+#html_result.write(build_mms_with_img(MYSELF, '01/01/1970', '20200315_120238.jpg', msg="Je t'aime"))
 
 #html_result.write(build_mms_with_quote(CONTACT_NAME, '01/01/1970', MYSELF, quote="Je t'aime", msg="Je t'aime",))
 #html_result.write(build_mms_with_quote(MYSELF, '01/01/1970', CONTACT_NAME, quote="Je t'aime", msg="Je t'aime"))
