@@ -5,11 +5,14 @@ class MMS(object):
   def __init__(self, date, mms_type, body, part_count, quote_id, quote_body, reactions, mms_id, part_ct, part_unique_id, part_width, part_height):
     self.date = date
     self.mms_type = mms_type
-    self.body = body 
+    self.body = body
     self.part_count = part_count
     self.quote_id = quote_id
     self.quote_body = quote_body
-    self.reactions = reactions
+    if reactions:
+      self.reactions = reactions[:11].decode('utf-8')
+    else:
+      self.reactions = reactions
 
     self.part_ct = part_ct
     self.part_width = part_width
@@ -44,7 +47,10 @@ class SMS(object):
     self.sms_type = sms_type
     self.thread_id = thread_id
     self.address = address
-    self.reactions = reactions
+    if reactions:
+      self.reactions = reactions[:11].decode('utf-8')
+    else:
+      self.reactions = reactions
 
   def __str__(self):
     return self.__repr__()
