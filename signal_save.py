@@ -232,9 +232,9 @@ for msg_key, msgi in msg.items():
 
   if isinstance(msgi, SMS):
     if msgi.sms_type == SMS_RECV:
-      html_result.write(build_sms(CONTACT_NAME, msg_date, msg=msgi.body))
+      html_result.write(build_msg(CONTACT_NAME, msg_date, msgi.body))
     elif msgi.sms_type == SMS_SENT:
-      html_result.write(build_sms(MYSELF, msg_date, msg=msgi.body))
+      html_result.write(build_msg(MYSELF, msg_date, msgi.body))
     elif msgi.sms_type in SMS_NULL:
       pass
     else:
@@ -248,20 +248,20 @@ for msg_key, msgi in msg.items():
         quoted_msg = msg.get(msgi.quote_id)
         # MMS can quote an SMS
         if isinstance(quoted_msg, SMS):
-          html_result.write(build_mms_with_quote(CONTACT_NAME, msg_date, MYSELF, quote=msgi.quote_body, msg=msgi.body))
+          html_result.write(build_msg(CONTACT_NAME, msg_date, msgi.body, contact_quoted=MYSELF, quote=msgi.quote_body, quote_date=quoted_msg.date))
         # MMS can quote an MMS
         elif isinstance(quoted_msg, MMS):
           # MMS quote an MMS with an image
           if quoted_msg is msg.keys() and quoted_mms.filename is not None:
-            html_result.write(build_mms_with_quote_and_img(CONTACT_NAME, msg_date, MYSELF, PATH_ATTACHMENTS + quoted_msg.filename, quote= msgi.quote_body, msg=msgi.body))
+            html_result.write(build_msg(CONTACT_NAME, msg_date, msgi.body, contact_quoted=MYSELF, filename=PATH_ATTACHMENTS + quoted_msg.filename, quote= msgi.quote_body, quote_date=quoted_msg.date))
           # MMS quote an MMS without an image
           else:
-            html_result.write(build_mms_with_quote(CONTACT_NAME, msg_date, MYSELF, quote=msgi.quote_body, msg=msgi.body,))
+            html_result.write(build_msg(CONTACT_NAME, msg_date, msgi.body, contact_quoted=MYSELF, quote=msgi.quote_body, quote_date=quoted_msg.date))
         else:
-          html_result.write(build_mms_with_quote(CONTACT_NAME, msg_date, MYSELF, quote="NULL quote", msg=msgi.body,))
+          html_result.write(build_msg(CONTACT_NAME, msg_date, msgi.body, contact_quoted=MYSELF, quote="NULL quote", quote_date="NULL"))
       # MMS is embedding a simple MMS without quoting
       elif msgi.filename is not None:
-        html_result.write(build_mms_with_img(CONTACT_NAME, msg_date, PATH_ATTACHMENTS + msgi.filename, msg=msgi.body))
+        html_result.write(build_msg(CONTACT_NAME, msg_date, msgi.body, filename=PATH_ATTACHMENTS + msgi.filename))
       else:
         raise ValueError
 
@@ -272,27 +272,27 @@ for msg_key, msgi in msg.items():
         quoted_msg = msg.get(msgi.quote_id)
         # MMS can quote an SMS
         if isinstance(quoted_msg, SMS):
-          html_result.write(build_mms_with_quote(MYSELF, msg_date, CONTACT_NAME, quote=msgi.quote_body, msg=msgi.body))
+          html_result.write(build_msg(MYSELF, msg_date, msgi.body, contact_quoted=CONTACT_NAME, quote=msgi.quote_body, quote_date=quoted_msg.date))
         # MMS can quote an MMS
         elif isinstance(quoted_msg, MMS):
           # MMS quote an MMS with an image
           if quoted_msg is msg.keys() and quoted_mms.filename is not None:
-            html_result.write(build_mms_with_quote_and_img(MYSELF, msg_date, CONTACT_NAME, PATH_ATTACHMENTS + quoted_msg.filename, quote= msgi.quote_body, msg=msgi.body))
+            html_result.write(build_msg(MYSELF, msg_date, msgi.body, contact_quoted=CONTACT_NAME, filename=PATH_ATTACHMENTS + quoted_msg.filename, quote= msgi.quote_body, quote_date=quoted_msg.date))
           # MMS quote an MMS without an image
           else:
-            html_result.write(build_mms_with_quote(MYSELF, msg_date, CONTACT_NAME, quote=msgi.quote_body, msg=msgi.body,))
+            html_result.write(build_msg(MYSELF, msg_date, msgi.body, contact_quoted=CONTACT_NAME, quote=msgi.quote_body, quote_date=quoted_msg.date))
         else:
-          html_result.write(build_mms_with_quote(MYSELF, msg_date, CONTACT_NAME, quote="NULL quote", msg=msgi.body,))
+          html_result.write(build_msg(MYSELF, msg_date, msgi.body, contact_quoted=CONTACT_NAME, quote="NULL quote", quote_date="NULL"))
       # MMS is embedding a simple MMS without quoting
       elif msgi.filename is not None:
-        html_result.write(build_mms_with_img(MYSELF, msg_date, PATH_ATTACHMENTS + msgi.filename, msg=msgi.body))
+        html_result.write(build_msg(MYSELF, msg_date, msgi.body, filename=PATH_ATTACHMENTS + msgi.filename))
       else:
         raise ValueError
 
     elif msgi.mms_type in SMS_NULL:
       pass
-    else:
-      raise ValueError(msgi)
+    #else:
+    #  raise ValueError(msgi)
   else:
     raise ValueError
 
