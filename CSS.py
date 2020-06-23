@@ -42,8 +42,8 @@ MMS_IMG = """
         <div class="col-md-12 name_{css}">
           {contact_name} - {date}
         </div>
-          <a href="{img_path}">
-          <img src="{img_path}">
+          <a href="{filename}">
+          <img src="{filename}">
           </a>
         {msg}
         </div>
@@ -57,7 +57,7 @@ MMS_QUOTE = """
         {contact_name} - {date}
         </div>
         <div class="col-md-12 name_{css}">
-	{contact_name_quote} - {quote_date}
+	{contact_quoted} - {quote_date}
         <div class="col-md-12 quote_{css}">
         {quote}
         </div>
@@ -73,10 +73,11 @@ MMS_QUOTE_IMG = """
         {contact_name} - {date}
         </div>
         <div class="col-md-12 name_{css}">
-	{contact_name_quote} - {quote_date}
+        {contact_quoted} - {quote_date}
+	{quote}
         <div class="col-md-12 quote_{css}">
-        <a href="{img_path}">
-          <img src="{img_path}">
+        <a href="{filename}">
+          <img src="{filename}">
         </a>
         {quote}
         </div>
