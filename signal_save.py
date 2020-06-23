@@ -123,53 +123,6 @@ def fetch_part_used(db_cursor):
 def build_header():
   return HEAD + NAVBAR
 
-def build_sms(contact_name, date, msg=""):
-  if contact_name == CONTACT_NAME:
-    offset = "offset-md-5"
-    css = "mycontact"
-  elif contact_name == MYSELF:
-    offset = ""
-    css = "myself"
-  else:
-    raise ValueError(contact_name)
-
-  return SMS_CSS.format(contact_name = contact_name, date = date, msg = msg, css = css, offset = offset)
-
-def build_mms_with_img(contact_name, date, img_path, msg=""):
-  if contact_name == CONTACT_NAME:
-      offset = "offset-md-5"
-      css = "mycontact"
-  elif contact_name == MYSELF:
-    offset = ""
-    css = "myself"
-  else:
-    raise ValueError
-  return MMS_IMG.format(contact_name = contact_name, date = date, msg = msg, img_path = img_path, css = css, offset = offset)
-
-def build_mms_with_quote(contact_name, date, contact_name_quote, quote="", msg=""):
-  if contact_name == CONTACT_NAME:
-      offset = "offset-md-5"
-      css = "mycontact"
-  elif contact_name == MYSELF:
-    offset = ""
-    css = "myself"
-  else:
-    raise ValueError
-
-  return MMS_QUOTE.format(contact_name = contact_name, date = date, msg = msg, contact_name_quote = contact_name_quote, quote = quote, css = css, offset = offset) 
-
-def build_mms_with_quote_and_img(contact_name, date, contact_name_quote, img_path, quote="", msg=""):
-  if contact_name == CONTACT_NAME:
-    offset = "offset-md-5"
-    css = "mycontact"
-  elif contact_name == MYSELF:
-    offset = ""
-    css = "myself"
-  else:
-    raise ValueError
-
-  return MMS_QUOTE_IMG.format(contact_name = contact_name, date = date, msg = msg, contact_name_quote = contact_name_quote, quote = quote, css = css, img_path = img_path, offset = offset)
-
 def build_msg(contact_name, date, msg, filename=None, contact_quoted=None, quote=None, quote_date=None):
   if contact_name == CONTACT_NAME:
     offset = "offset-md-5"
