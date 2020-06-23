@@ -33,11 +33,10 @@ class MMS(object):
     self.quote_body = quote_body
     self.reactions = reactions
 
-    #self.mms_id = mms_id
-    #self.part_unique_id = part_unique_id
     self.part_ct = part_ct
     self.part_width = part_width
     self.part_height = part_height
+
     if part_unique_id is not None:
       assert(mms_id is not None)
       self.filename = str(part_unique_id) + "_" + str(mms_id)
