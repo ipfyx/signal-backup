@@ -8,3 +8,4 @@ stickers/
 *.html
 *.swp
 *.tgz
+__pycache__
