@@ -276,26 +276,6 @@ html_result.close()
 html_result = open('test.html','w')
 html_result.write(build_header())
 
-#for smsi in sms:
-#  sms_date = datetime.fromtimestamp(smsi.date//1000)
-#  if smsi.sms_type == SMS_RECV:
-#    html_result.write(build_sms(CONTACT_NAME, sms_date, msg=smsi.body))
-#  elif smsi.sms_type == SMS_SENT:
-#    html_result.write(build_sms(MYSELF, sms_date, msg=smsi.body))
-#  elif smsi.sms_type == 2097684:
-#    pass
-#  else:
-#    print(smsi)
-#    #raise ValueError
-
-# MMS
-# self.date = date
-# self.body = body 
-# self.part_count = part_count
-# self.quote_id = quote_id
-# self.quote_body = quote_body
-# self.reactions = reactions
-
 for msg_key, msgi in msg.items():
   msg_date = datetime.fromtimestamp(msg_key//1000)
 
@@ -364,16 +344,6 @@ for msg_key, msgi in msg.items():
       raise ValueError(msgi)
   else:
     raise ValueError
-
-#html_result.write(build_mms_with_img(CONTACT_NAME, '01/01/1970', '20200315_120238.jpg', msg="Je t'aime"))
-#html_result.write(build_mms_with_img(MYSELF, '01/01/1970', '20200315_120238.jpg', msg="Je t'aime"))
-
-#html_result.write(build_mms_with_quote(CONTACT_NAME, '01/01/1970', MYSELF, quote="Je t'aime", msg="Je t'aime",))
-#html_result.write(build_mms_with_quote(MYSELF, '01/01/1970', CONTACT_NAME, quote="Je t'aime", msg="Je t'aime"))
-#html_result.write(build_mms_with_quote_and_img(CONTACT_NAME, '01/01/1970', MYSELF, '20200315_120238.jpg', quote="Je t'aime", msg="Je t'aime"))
-#html_result.write(build_mms_with_quote_and_img(MYSELF, '01/01/1970', CONTACT_NAME, '20200315_120238.jpg', quote="Je t'aime", msg="Je t'aime"))
-
-
 
 html_result.write(build_footer())
 html_result.close()
