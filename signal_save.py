@@ -170,7 +170,7 @@ def build_mms_with_quote_and_img(contact_name, date, contact_name_quote, img_pat
 
   return MMS_QUOTE_IMG.format(contact_name = contact_name, date = date, msg = msg, contact_name_quote = contact_name_quote, quote = quote, css = css, img_path = img_path, offset = offset)
 
-def build_msg(contact_name, date, msg, img_path=None, contact_quoted=None, quote=None, quote_date=None):
+def build_msg(contact_name, date, msg, filename=None, contact_quoted=None, quote=None, quote_date=None):
   if contact_name == CONTACT_NAME:
     offset = "offset-md-5"
     css = "mycontact"
@@ -181,18 +181,18 @@ def build_msg(contact_name, date, msg, img_path=None, contact_quoted=None, quote
     raise ValueError
 
   # MMS with IMG & QUOTE
-  if img_path and quote_date:
+  if filename and quote_date:
     assert(quote is not None)
     assert(contact_quoted is not None)
-    return MMS_QUOTE_IMG.format(contact_name = contact_name, date = date, msg = msg, contact_name_quote = contact_name_quote, quote = quote, quote_date = quote_date, css = css, img_path = img_path, offset = offset)
+    return MMS_QUOTE_IMG.format(contact_name = contact_name, date = date, msg = msg, contact_quoted = contact_quoted, quote = quote, quote_date = quote_date, css = css, filename = filename, offset = offset)
 
   # MMS with QUOTE
   elif quote_date:
-    return MMS_QUOTE.format(contact_name = contact_name, date = date, msg = msg, contact_name_quote = contact_name_quote, quote = quote, quote_date = quote_date, css = css, offset = offset) 
+    return MMS_QUOTE.format(contact_name = contact_name, date = date, msg = msg, contact_quoted = contact_quoted, quote = quote, quote_date = quote_date, css = css, offset = offset) 
  
   # MMS with IMG
-  elif img_path:
-    return MMS_IMG.format(contact_name = contact_name, date = date, msg = msg, img_path = img_path, css = css, offset = offset)
+  elif filename:
+    return MMS_IMG.format(contact_name = contact_name, date = date, msg = msg, filename = filename, css = css, offset = offset)
 
   # SMS
   else:
@@ -207,17 +207,17 @@ msg = OrderedDict(sorted(fetch_contact_msg(CONTACT_ADDRESS, db_cursor).items()))
 html_result = open('gabrielle.html','w')
 html_result.write(build_header())
 
-html_result.write(build_sms(CONTACT_NAME, '01/01/1970', msg="Je t'aime"))
-html_result.write(build_sms(MYSELF, '01/01/1970', msg="Je t'aime"))
+html_result.write(build_msg(CONTACT_NAME, '01/01/1970', "Je t'aime"))
+html_result.write(build_msg(MYSELF, '01/01/1970', "Je t'aime"))
 
-html_result.write(build_mms_with_img(CONTACT_NAME, '01/01/1970', '20200315_120238.jpg', msg="Je t'aime"))
-html_result.write(build_mms_with_img(MYSELF, '01/01/1970', '20200315_120238.jpg', msg="Je t'aime"))
+html_result.write(build_msg(CONTACT_NAME, '01/01/1970', "Je t'aime", filename='20200315_120238.jpg'))
+html_result.write(build_msg(MYSELF, '01/01/1970', "Je t'aime", filename='20200315_120238.jpg'))
 
-html_result.write(build_mms_with_quote(CONTACT_NAME, '01/01/1970', MYSELF, quote="Je t'aime", msg="Je t'aime",))
-html_result.write(build_mms_with_quote(MYSELF, '01/01/1970', CONTACT_NAME, quote="Je t'aime", msg="Je t'aime"))
+html_result.write(build_msg(CONTACT_NAME, '01/01/1970', "Je t'aime", contact_quoted=MYSELF, quote="Je t'aime", quote_date='01/01/1970'))
+html_result.write(build_msg(MYSELF, '01/01/1970', "Je t'aime", contact_quoted=CONTACT_NAME, quote="Je t'aime", quote_date='01/01/1970'))
 
-html_result.write(build_mms_with_quote_and_img(CONTACT_NAME, '01/01/1970', MYSELF, '20200315_120238.jpg', quote="Je t'aime", msg="Je t'aime"))
-html_result.write(build_mms_with_quote_and_img(MYSELF, '01/01/1970', CONTACT_NAME, '20200315_120238.jpg', quote="Je t'aime", msg="Je t'aime"))
+html_result.write(build_msg(CONTACT_NAME, '01/01/1970', "Je t'aime", contact_quoted=MYSELF, filename='20200315_120238.jpg', quote="Je t'aime" ,quote_date='01/01/1970'))
+html_result.write(build_msg(MYSELF, '01/01/1970', "Je t'aime", contact_quoted=CONTACT_NAME, quote="Je t'aime", filename='20200315_120238.jpg', quote_date='01/01/1970'))
 
 html_result.write(build_footer())
 html_result.close()
