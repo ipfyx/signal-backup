@@ -200,7 +200,7 @@ def build_mms_with_quote(contact_name, date, contact_name_quote, css="mycontact"
       <section class="row">
         <div class="col-md-6 msg_{css} {offset}">
         <div class="col-md-12 name_{css}">
-	{contact_name}
+        {contact_name} - {date}
         </div>
         <div class="col-md-12 name_{css}">
 	{contact_name_quote}
@@ -227,7 +227,7 @@ def build_mms_with_quote_and_img(contact_name, date, contact_name_quote, img_pat
       <section class="row">
         <div class="col-md-6 msg_{css} {offset}">
         <div class="col-md-12 name_{css}">
-	{contact_name}
+        {contact_name} - {date}
         </div>
         <div class="col-md-12 name_{css}">
 	{contact_name_quote}
