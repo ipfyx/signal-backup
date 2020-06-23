@@ -6,3 +6,5 @@ config/
 signal_backup.db
 stickers/
 *.html
+*.swp
+*.tgz
