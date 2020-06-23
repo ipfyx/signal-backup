@@ -3,7 +3,7 @@
 
 import sqlite3
 from functools import total_ordering
-from pdb import pm
+from pdb import pm,set_trace
 from datetime import datetime
 from collections import OrderedDict
 
@@ -18,6 +18,8 @@ PATH_ATTACHMENTS = './attachment/'
 
 SMS_SENT = 10485783
 SMS_RECV = 10485780
+
+SMS_NULL = [10747924,10747927,2,1,3]
 
 @total_ordering
 class MMS(object):
@@ -98,13 +100,12 @@ class PART(object):
 
 def fetch_contact_msg(contact_address, db_cursor):
   # MMS
-  #db_cursor.execute("select date,msg_box,body,part_count,quote_id,quote_body,reactions FROM MMS where thread_id=={}".format(thread_id))
   db_cursor.execute("select date, msg_box, body, part_count, quote_id, quote_body, reactions, part._id, part.ct, part.unique_id, part.width, part.height FROM MMS LEFT JOIN part ON part.mid = MMS._id WHERE thread_id={}".format(THREAD_ID))
   msg = OrderedDict()
   for m in db_cursor.fetchall():
     msg[m[0]] = MMS(m[0],m[1],m[2],m[3],m[4],m[5],m[6],m[7],m[8],m[9],m[10],m[11])
 
-  db_cursor.execute("select thread_id, address, date, type, body, reactions FROM sms where thread_id=={}".format(THREAD_ID))
+  db_cursor.execute("select thread_id, address, date_sent, type, body, reactions FROM sms where thread_id=={}".format(THREAD_ID))
   for s in db_cursor.fetchall():
     if msg.get(s[2]):
       raise ValueError
@@ -296,7 +297,6 @@ html_result.write(build_header())
 # self.reactions = reactions
 
 for msg_key, msgi in msg.items():
-
   msg_date = datetime.fromtimestamp(msg_key//1000)
 
   if isinstance(msgi, SMS):
@@ -304,8 +304,10 @@ for msg_key, msgi in msg.items():
       html_result.write(build_sms(CONTACT_NAME, msg_date, msg=msgi.body))
     elif msgi.sms_type == SMS_SENT:
       html_result.write(build_sms(MYSELF, msg_date, msg=msgi.body))
+    elif msgi.sms_type in SMS_NULL:
+      pass
     else:
-      print(msgi)
+      raise ValueError(msgi.sms_type)
 
   elif isinstance(msgi, MMS):
     # MMS recieved
@@ -324,6 +326,8 @@ for msg_key, msgi in msg.items():
           # MMS quote an MMS without an image
           else:
             html_result.write(build_mms_with_quote(CONTACT_NAME, msg_date, MYSELF, quote=msgi.quote_body, msg=msgi.body,))
+        else:
+          html_result.write(build_mms_with_quote(CONTACT_NAME, msg_date, MYSELF, quote="NULL quote", msg=msgi.body,))
       # MMS is embedding a simple MMS without quoting
       elif msgi.filename is not None:
         html_result.write(build_mms_with_img(CONTACT_NAME, msg_date, PATH_ATTACHMENTS + msgi.filename, msg=msgi.body))
@@ -346,14 +350,18 @@ for msg_key, msgi in msg.items():
           # MMS quote an MMS without an image
           else:
             html_result.write(build_mms_with_quote(MYSELF, msg_date, CONTACT_NAME, quote=msgi.quote_body, msg=msgi.body,))
+        else:
+          html_result.write(build_mms_with_quote(MYSELF, msg_date, CONTACT_NAME, quote="NULL quote", msg=msgi.body,))
       # MMS is embedding a simple MMS without quoting
       elif msgi.filename is not None:
         html_result.write(build_mms_with_img(MYSELF, msg_date, PATH_ATTACHMENTS + msgi.filename, msg=msgi.body))
       else:
         raise ValueError
 
+    elif msgi.mms_type in SMS_NULL:
+      pass
     else:
-      print(msgi)
+      raise ValueError(msgi)
   else:
     raise ValueError
 
