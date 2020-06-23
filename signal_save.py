@@ -184,11 +184,11 @@ def build_msg(contact_name, date, msg, img_path=None, contact_quoted=None, quote
   if img_path and quote_date:
     assert(quote is not None)
     assert(contact_quoted is not None)
-    return MMS_QUOTE_IMG.format(contact_name = contact_name, date = date, msg = msg, contact_name_quote = contact_name_quote, quote = quote, css = css, img_path = img_path, offset = offset)
+    return MMS_QUOTE_IMG.format(contact_name = contact_name, date = date, msg = msg, contact_name_quote = contact_name_quote, quote = quote, quote_date = quote_date, css = css, img_path = img_path, offset = offset)
 
   # MMS with QUOTE
   elif quote_date:
-    return MMS_QUOTE.format(contact_name = contact_name, date = date, msg = msg, contact_name_quote = contact_name_quote, quote = quote, css = css, offset = offset) 
+    return MMS_QUOTE.format(contact_name = contact_name, date = date, msg = msg, contact_name_quote = contact_name_quote, quote = quote, quote_date = quote_date, css = css, offset = offset) 
  
   # MMS with IMG
   elif img_path:
