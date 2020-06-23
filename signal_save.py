@@ -96,7 +96,7 @@ class PART(object):
     return "id : {}, filename : {}, ct : {}, unique_id : {}, width : {}, height : {}".format(self.id_part, self.filename, self.ct, self.unique_id, self.width, self.height)
 
   def __str__(self):
-    return "id : {}, filename : {}, ct : {}, unique_id : {}, width : {}, height : {}".format(self.id_part, self.filename, self.ct, self.unique_id, self.width, self.height)
+    return self.__repr__()
 
 def fetch_contact_msg(contact_address, db_cursor):
   # MMS
@@ -113,11 +113,11 @@ def fetch_contact_msg(contact_address, db_cursor):
 
   return msg
   
-def fetch_part(db_cursor):
-  db_cursor.execute("select _id, ct, unique_id, width, height FROM part")
-  part = []
+def fetch_part_used(db_cursor):
+  db_cursor.execute("select part._id, part.ct, part.unique_id, part.width, part.height FROM PART INNER JOIN mms ON part.mid = mms._id WHERE thread_id={}".format(THREAD_ID))
+  part = OrderedDict()
   for p in db_cursor.fetchall():
-    part.append(PART(p[0],p[1],p[2],p[3],p[4]))
+    part[p[0]] = PART(p[0],p[1],p[2],p[3],p[4])
   return part
 
 def build_header():
