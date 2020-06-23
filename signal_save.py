@@ -170,6 +170,34 @@ def build_mms_with_quote_and_img(contact_name, date, contact_name_quote, img_pat
 
   return MMS_QUOTE_IMG.format(contact_name = contact_name, date = date, msg = msg, contact_name_quote = contact_name_quote, quote = quote, css = css, img_path = img_path, offset = offset)
 
+def build_msg(contact_name, date, msg, img_path=None, contact_quoted=None, quote=None, quote_date=None):
+  if contact_name == CONTACT_NAME:
+    offset = "offset-md-5"
+    css = "mycontact"
+  elif contact_name == MYSELF:
+    offset = ""
+    css = "myself"
+  else:
+    raise ValueError
+
+  # MMS with IMG & QUOTE
+  if img_path and quote_date:
+    assert(quote is not None)
+    assert(contact_quoted is not None)
+    return MMS_QUOTE_IMG.format(contact_name = contact_name, date = date, msg = msg, contact_name_quote = contact_name_quote, quote = quote, css = css, img_path = img_path, offset = offset)
+
+  # MMS with QUOTE
+  elif quote_date:
+    return MMS_QUOTE.format(contact_name = contact_name, date = date, msg = msg, contact_name_quote = contact_name_quote, quote = quote, css = css, offset = offset) 
+ 
+  # MMS with IMG
+  elif img_path:
+    return MMS_IMG.format(contact_name = contact_name, date = date, msg = msg, img_path = img_path, css = css, offset = offset)
+
+  # SMS
+  else:
+    return SMS_CSS.format(contact_name = contact_name, date = date, msg = msg, css = css, offset = offset)
+
 def build_footer():
   return  FOOTER
 
