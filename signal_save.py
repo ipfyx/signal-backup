@@ -8,14 +8,14 @@ from collections import OrderedDict
 from CSS import *
 from signal_structure import MMS, SMS, PART
 
-conn = sqlite3.connect('signal_backup.db')
+conn = sqlite3.connect('./out2/signal_backup.db')
 db_cursor = conn.cursor()
 
 THREAD_ID = 25
 CONTACT_ADDRESS = 102
 CONTACT_NAME = 'Gabrielle'
 MYSELF = 'Florian'
-PATH_ATTACHMENTS = './attachment/'
+PATH_ATTACHMENTS = './out2/attachment/'
 
 SMS_SENT = 10485783
 SMS_RECV = 10485780
@@ -60,10 +60,12 @@ def build_msg(contact_name, date, msg, filename=None, contact_quoted=None, quote
   if filename and quote_date:
     assert(quote is not None)
     assert(contact_quoted is not None)
+    quote_date = datetime.fromtimestamp(int(quote_date)//1000)
     return MMS_QUOTE_IMG.format(contact_name = contact_name, date = date, msg = msg, contact_quoted = contact_quoted, quote = quote, quote_date = quote_date, css = css, filename = filename, offset = offset)
 
   # MMS with QUOTE
   elif quote_date:
+    quote_date = datetime.fromtimestamp(int(quote_date)//1000)
     return MMS_QUOTE.format(contact_name = contact_name, date = date, msg = msg, contact_quoted = contact_quoted, quote = quote, quote_date = quote_date, css = css, offset = offset) 
  
   # MMS with IMG
@@ -83,17 +85,17 @@ msg = OrderedDict(sorted(fetch_contact_msg(CONTACT_ADDRESS, db_cursor).items()))
 html_result = open('gabrielle.html','w')
 html_result.write(build_header())
 
-html_result.write(build_msg(CONTACT_NAME, '01/01/1970', "Je t'aime"))
-html_result.write(build_msg(MYSELF, '01/01/1970', "Je t'aime"))
+html_result.write(build_msg(CONTACT_NAME, '1583604356792', "Je t'aime"))
+html_result.write(build_msg(MYSELF, '1583604356792', "Je t'aime"))
 
-html_result.write(build_msg(CONTACT_NAME, '01/01/1970', "Je t'aime", filename='20200315_120238.jpg'))
-html_result.write(build_msg(MYSELF, '01/01/1970', "Je t'aime", filename='20200315_120238.jpg'))
+html_result.write(build_msg(CONTACT_NAME, '1583604356792', "Je t'aime", filename='20200315_120238.jpg'))
+html_result.write(build_msg(MYSELF, '1583604356792', "Je t'aime", filename='20200315_120238.jpg'))
 
-html_result.write(build_msg(CONTACT_NAME, '01/01/1970', "Je t'aime", contact_quoted=MYSELF, quote="Je t'aime", quote_date='01/01/1970'))
-html_result.write(build_msg(MYSELF, '01/01/1970', "Je t'aime", contact_quoted=CONTACT_NAME, quote="Je t'aime", quote_date='01/01/1970'))
+html_result.write(build_msg(CONTACT_NAME, '1583604356792', "Je t'aime", contact_quoted=MYSELF, quote="Je t'aime", quote_date='1583604356792'))
+html_result.write(build_msg(MYSELF, '1583604356792', "Je t'aime", contact_quoted=CONTACT_NAME, quote="Je t'aime", quote_date='1583604356792'))
 
-html_result.write(build_msg(CONTACT_NAME, '01/01/1970', "Je t'aime", contact_quoted=MYSELF, filename='20200315_120238.jpg', quote="Je t'aime" ,quote_date='01/01/1970'))
-html_result.write(build_msg(MYSELF, '01/01/1970', "Je t'aime", contact_quoted=CONTACT_NAME, quote="Je t'aime", filename='20200315_120238.jpg', quote_date='01/01/1970'))
+html_result.write(build_msg(CONTACT_NAME, '1583604356792', "Je t'aime", contact_quoted=MYSELF, filename='20200315_120238.jpg', quote="Je t'aime" ,quote_date='1583604356792'))
+html_result.write(build_msg(MYSELF, '1583604356792', "Je t'aime", contact_quoted=CONTACT_NAME, quote="Je t'aime", filename='20200315_120238.jpg', quote_date='1583604356792'))
 
 html_result.write(build_footer())
 html_result.close()
@@ -102,9 +104,11 @@ html_result.close()
 
 html_result = open('test.html','w')
 html_result.write(build_header())
+set_trace()
 
 for msg_key, msgi in msg.items():
   msg_date = datetime.fromtimestamp(msg_key//1000)
+  print(msgi)
 
   if isinstance(msgi, SMS):
     if msgi.sms_type == SMS_RECV:
@@ -134,7 +138,7 @@ for msg_key, msgi in msg.items():
           else:
             html_result.write(build_msg(CONTACT_NAME, msg_date, msgi.body, contact_quoted=MYSELF, quote=msgi.quote_body, quote_date=quoted_msg.date))
         else:
-          html_result.write(build_msg(CONTACT_NAME, msg_date, msgi.body, contact_quoted=MYSELF, quote="NULL quote", quote_date="NULL"))
+          html_result.write(build_msg(CONTACT_NAME, msg_date, msgi.body, contact_quoted=MYSELF, quote="NULL quote", quote_date=None))
       # MMS is embedding a simple MMS without quoting
       elif msgi.filename is not None:
         html_result.write(build_msg(CONTACT_NAME, msg_date, msgi.body, filename=PATH_ATTACHMENTS + msgi.filename))
@@ -158,7 +162,7 @@ for msg_key, msgi in msg.items():
           else:
             html_result.write(build_msg(MYSELF, msg_date, msgi.body, contact_quoted=CONTACT_NAME, quote=msgi.quote_body, quote_date=quoted_msg.date))
         else:
-          html_result.write(build_msg(MYSELF, msg_date, msgi.body, contact_quoted=CONTACT_NAME, quote="NULL quote", quote_date="NULL"))
+          html_result.write(build_msg(MYSELF, msg_date, msgi.body, contact_quoted=CONTACT_NAME, quote="NULL quote", quote_date=None))
       # MMS is embedding a simple MMS without quoting
       elif msgi.filename is not None:
         html_result.write(build_msg(MYSELF, msg_date, msgi.body, filename=PATH_ATTACHMENTS + msgi.filename))
