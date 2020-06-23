@@ -6,6 +6,7 @@ from functools import total_ordering
 from pdb import pm,set_trace
 from datetime import datetime
 from collections import OrderedDict
+from CSS import *
 
 conn = sqlite3.connect('signal_backup.db')
 db_cursor = conn.cursor()
@@ -121,134 +122,57 @@ def fetch_part(db_cursor):
   return part
 
 def build_header():
-  head = """
-  <!DOCTYPE html>
-  <html>
-    <head>
-      <link href="bootstrap-4.4.1-dist/css/bootstrap.css" rel="stylesheet">
-      <link href="signal.css" rel="stylesheet">
-    </head>
-    <body>
-  """
-  navbar = """
-    <div class="container">
-  
-      <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <a class="navbar-brand" href="#">Navbar</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      </nav>
-  """
-  return head + navbar
+  return HEAD + NAVBAR
 
-def build_sms(contact_name, date, css="mycontact" , msg="", offset=""):
+def build_sms(contact_name, date, msg=""):
   if contact_name == CONTACT_NAME:
     offset = "offset-md-5"
     css = "mycontact"
   elif contact_name == MYSELF:
+    offset = ""
     css = "myself"
   else:
-    raise ValueError
+    raise ValueError(contact_name)
 
-  row = """
-        <section class="row">
-          <div class="col-md-6 msg_{css} {offset}">
-          <div class="col-md-12 name_{css}">
-            {contact_name} - {date}
-          </div>
-          {msg}
-          </div>
-        </section>
-  """.format(contact_name = contact_name, date = date, msg = msg, css = css, offset = offset)
-  return row
+  return SMS_CSS.format(contact_name = contact_name, date = date, msg = msg, css = css, offset = offset)
 
-def build_mms_with_img(contact_name, date, img_path, css="mycontact", msg="", offset=""):
+def build_mms_with_img(contact_name, date, img_path, msg=""):
   if contact_name == CONTACT_NAME:
       offset = "offset-md-5"
       css = "mycontact"
   elif contact_name == MYSELF:
+    offset = ""
     css = "myself"
   else:
     raise ValueError
+  return MMS_IMG.format(contact_name = contact_name, date = date, msg = msg, img_path = img_path, css = css, offset = offset)
 
-  row = """
-      <section class="row">
-        <div class="col-md-6 msg_{css} {offset}">
-        <div class="col-md-12 name_{css}">
-          {contact_name} - {date}
-        </div>
-          <a href="{img_path}">
-          <img src="{img_path}">
-          </a>
-        {msg}
-        </div>
-      </section>
-  """.format(contact_name = contact_name, date = date, msg = msg, img_path = img_path, css = css, offset = offset)
-  return row
-
-def build_mms_with_quote(contact_name, date, contact_name_quote, css="mycontact", quote="", msg="", offset=""):
+def build_mms_with_quote(contact_name, date, contact_name_quote, quote="", msg=""):
   if contact_name == CONTACT_NAME:
       offset = "offset-md-5"
       css = "mycontact"
   elif contact_name == MYSELF:
+    offset = ""
     css = "myself"
   else:
     raise ValueError
 
-  row = """
-      <section class="row">
-        <div class="col-md-6 msg_{css} {offset}">
-        <div class="col-md-12 name_{css}">
-        {contact_name} - {date}
-        </div>
-        <div class="col-md-12 name_{css}">
-	{contact_name_quote}
-        <div class="col-md-12 quote_{css}">
-        {quote}
-        </div>
-        </div>
-	{msg}
-        </div>
-      </section>
-  """.format(contact_name = contact_name, date = date, msg = msg, contact_name_quote = contact_name_quote, quote = quote, css = css, offset = offset)
-  return row
+  return MMS_QUOTE.format(contact_name = contact_name, date = date, msg = msg, contact_name_quote = contact_name_quote, quote = quote, css = css, offset = offset) 
 
-def build_mms_with_quote_and_img(contact_name, date, contact_name_quote, img_path, css="mycontact", quote="", msg="", offset=""):
+def build_mms_with_quote_and_img(contact_name, date, contact_name_quote, img_path, quote="", msg=""):
   if contact_name == CONTACT_NAME:
-        offset = "offset-md-5"
-        css = "mycontact"
+    offset = "offset-md-5"
+    css = "mycontact"
   elif contact_name == MYSELF:
+    offset = ""
     css = "myself"
   else:
     raise ValueError
 
-  row = """
-      <section class="row">
-        <div class="col-md-6 msg_{css} {offset}">
-        <div class="col-md-12 name_{css}">
-        {contact_name} - {date}
-        </div>
-        <div class="col-md-12 name_{css}">
-	{contact_name_quote}
-        <div class="col-md-12 quote_{css}">
-        <a href="{img_path}">
-          <img src="{img_path}">
-        </a>
-        {quote}
-        </div>
-        </div>
-	{msg}
-        </div>
-      </section>
-  """.format(contact_name = contact_name, date = date, msg = msg, contact_name_quote = contact_name_quote, quote = quote, css = css, img_path = img_path, offset = offset)
-  return row
+  return MMS_QUOTE_IMG.format(contact_name = contact_name, date = date, msg = msg, contact_name_quote = contact_name_quote, quote = quote, css = css, img_path = img_path, offset = offset)
 
 def build_footer():
-  return """
-    </body>
-  </html>
-  """
+  return  FOOTER
 
 msg = OrderedDict(sorted(fetch_contact_msg(CONTACT_ADDRESS, db_cursor).items()))
 
