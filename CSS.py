@@ -47,6 +47,7 @@ MMS_IMG = """
           <img src="{filename}">
           </a>
         {msg}
+        {reaction}
         </div>
       </section>
   """
@@ -64,6 +65,7 @@ MMS_QUOTE = """
         </div>
         </div>
 	{msg}
+        {reaction}
         </div>
       </section>
   """

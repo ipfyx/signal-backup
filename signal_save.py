@@ -56,25 +56,30 @@ def build_msg(contact_name, date, msg, filename=None, contact_quoted=None, quote
   else:
     raise ValueError
 
+  if reaction:
+    reaction = REACTION_CSS.format(css=css,reaction=reaction)
+  else:
+    reaction=''
+
   # MMS with IMG & QUOTE
   if filename and quote_date:
     assert(quote is not None)
     assert(contact_quoted is not None)
     quote_date = datetime.fromtimestamp(int(quote_date)//1000)
-    return MMS_QUOTE_IMG.format(contact_name = contact_name, date = date, msg = msg, contact_quoted = contact_quoted, quote = quote, quote_date = quote_date, css = css, filename = filename, offset = offset)
+    return MMS_QUOTE_IMG.format(contact_name = contact_name, date = date, msg = msg, contact_quoted = contact_quoted, quote = quote, quote_date = quote_date, css = css, filename = filename, offset = offset, reaction=reaction)
 
   # MMS with QUOTE
   elif quote_date:
     quote_date = datetime.fromtimestamp(int(quote_date)//1000)
-    return MMS_QUOTE.format(contact_name = contact_name, date = date, msg = msg, contact_quoted = contact_quoted, quote = quote, quote_date = quote_date, css = css, offset = offset) 
+    return MMS_QUOTE.format(contact_name = contact_name, date = date, msg = msg, contact_quoted = contact_quoted, quote = quote, quote_date = quote_date, css = css, offset = offset, reaction=reaction) 
  
   # MMS with IMG
   elif filename:
-    return MMS_IMG.format(contact_name = contact_name, date = date, msg = msg, filename = filename, css = css, offset = offset)
+    return MMS_IMG.format(contact_name = contact_name, date = date, msg = msg, filename = filename, css = css, offset = offset, reaction=reaction)
 
   # SMS
   else:
-    return SMS_CSS.format(contact_name = contact_name, date = date, msg = msg, css = css, offset = offset, reaction=REACTION.format(css=css,reaction=reaction))
+    return SMS_CSS.format(contact_name = contact_name, date = date, msg = msg, css = css, offset = offset, reaction=reaction)
 
 def build_footer():
   return  FOOTER
@@ -110,9 +115,9 @@ for msg_key, msgi in msg.items():
 
   if isinstance(msgi, SMS):
     if msgi.sms_type == SMS_RECV:
-      html_result.write(build_msg(CONTACT_NAME, msg_date, msgi.body))
+      html_result.write(build_msg(CONTACT_NAME, msg_date, msgi.body, reaction=msgi.reactions))
     elif msgi.sms_type == SMS_SENT:
-      html_result.write(build_msg(MYSELF, msg_date, msgi.body))
+      html_result.write(build_msg(MYSELF, msg_date, msgi.body, reaction=msgi.reactions))
     elif msgi.sms_type in SMS_NULL:
       pass
     else:
@@ -126,20 +131,20 @@ for msg_key, msgi in msg.items():
         quoted_msg = msg.get(msgi.quote_id)
         # MMS can quote an SMS
         if isinstance(quoted_msg, SMS):
-          html_result.write(build_msg(CONTACT_NAME, msg_date, msgi.body, contact_quoted=MYSELF, quote=msgi.quote_body, quote_date=quoted_msg.date))
+          html_result.write(build_msg(CONTACT_NAME, msg_date, msgi.body, contact_quoted=MYSELF, quote=msgi.quote_body, quote_date=quoted_msg.date, reaction=msgi.reactions))
         # MMS can quote an MMS
         elif isinstance(quoted_msg, MMS):
           # MMS quote an MMS with an image
           if quoted_msg is msg.keys() and quoted_mms.filename is not None:
-            html_result.write(build_msg(CONTACT_NAME, msg_date, msgi.body, contact_quoted=MYSELF, filename=PATH_ATTACHMENTS + quoted_msg.filename, quote= msgi.quote_body, quote_date=quoted_msg.date))
+            html_result.write(build_msg(CONTACT_NAME, msg_date, msgi.body, contact_quoted=MYSELF, filename=PATH_ATTACHMENTS + quoted_msg.filename, quote= msgi.quote_body, quote_date=quoted_msg.date, reaction=msgi.reactions))
           # MMS quote an MMS without an image
           else:
-            html_result.write(build_msg(CONTACT_NAME, msg_date, msgi.body, contact_quoted=MYSELF, quote=msgi.quote_body, quote_date=quoted_msg.date))
+            html_result.write(build_msg(CONTACT_NAME, msg_date, msgi.body, contact_quoted=MYSELF, quote=msgi.quote_body, quote_date=quoted_msg.date, reaction=msgi.reactions))
         else:
-          html_result.write(build_msg(CONTACT_NAME, msg_date, msgi.body, contact_quoted=MYSELF, quote="NULL quote", quote_date=None))
+          html_result.write(build_msg(CONTACT_NAME, msg_date, msgi.body, contact_quoted=MYSELF, quote="NULL quote", quote_date=None, reaction=msgi.reactions))
       # MMS is embedding a simple MMS without quoting
       elif msgi.filename is not None:
-        html_result.write(build_msg(CONTACT_NAME, msg_date, msgi.body, filename=PATH_ATTACHMENTS + msgi.filename))
+        html_result.write(build_msg(CONTACT_NAME, msg_date, msgi.body, filename=PATH_ATTACHMENTS + msgi.filename, reaction=msgi.reactions))
       else:
         raise ValueError
 
@@ -150,20 +155,20 @@ for msg_key, msgi in msg.items():
         quoted_msg = msg.get(msgi.quote_id)
         # MMS can quote an SMS
         if isinstance(quoted_msg, SMS):
-          html_result.write(build_msg(MYSELF, msg_date, msgi.body, contact_quoted=CONTACT_NAME, quote=msgi.quote_body, quote_date=quoted_msg.date))
+          html_result.write(build_msg(MYSELF, msg_date, msgi.body, contact_quoted=CONTACT_NAME, quote=msgi.quote_body, quote_date=quoted_msg.date, reaction=msgi.reactions))
         # MMS can quote an MMS
         elif isinstance(quoted_msg, MMS):
           # MMS quote an MMS with an image
           if quoted_msg is msg.keys() and quoted_mms.filename is not None:
-            html_result.write(build_msg(MYSELF, msg_date, msgi.body, contact_quoted=CONTACT_NAME, filename=PATH_ATTACHMENTS + quoted_msg.filename, quote= msgi.quote_body, quote_date=quoted_msg.date))
+            html_result.write(build_msg(MYSELF, msg_date, msgi.body, contact_quoted=CONTACT_NAME, filename=PATH_ATTACHMENTS + quoted_msg.filename, quote= msgi.quote_body, quote_date=quoted_msg.date, reaction=msgi.reactions))
           # MMS quote an MMS without an image
           else:
-            html_result.write(build_msg(MYSELF, msg_date, msgi.body, contact_quoted=CONTACT_NAME, quote=msgi.quote_body, quote_date=quoted_msg.date))
+            html_result.write(build_msg(MYSELF, msg_date, msgi.body, contact_quoted=CONTACT_NAME, quote=msgi.quote_body, quote_date=quoted_msg.date, reaction=msgi.reactions))
         else:
-          html_result.write(build_msg(MYSELF, msg_date, msgi.body, contact_quoted=CONTACT_NAME, quote="NULL quote", quote_date=None))
+          html_result.write(build_msg(MYSELF, msg_date, msgi.body, contact_quoted=CONTACT_NAME, quote="NULL quote", quote_date=None, reaction=msgi.reactions))
       # MMS is embedding a simple MMS without quoting
       elif msgi.filename is not None:
-        html_result.write(build_msg(MYSELF, msg_date, msgi.body, filename=PATH_ATTACHMENTS + msgi.filename))
+        html_result.write(build_msg(MYSELF, msg_date, msgi.body, filename=PATH_ATTACHMENTS + msgi.filename, reaction=msgi.reactions))
       else:
         raise ValueError
 
