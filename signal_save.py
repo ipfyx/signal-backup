@@ -9,14 +9,14 @@ from collections import OrderedDict
 from CSS import *
 from signal_structure import MMS, SMS, PART, SMS_SENT, SMS_RECV, SMS_NULL
 
-def fetch_contact_msg(contact_address, db_cursor):
+def fetch_contact_msg(contact_address, db_cursor, thread_id):
   # MMS
-  db_cursor.execute("select date, msg_box, body, part_count, quote_id, quote_body, reactions, part._id, part.ct, part.unique_id, part.width, part.height FROM MMS LEFT JOIN part ON part.mid = MMS._id WHERE thread_id={}".format(THREAD_ID))
+  db_cursor.execute("select date, msg_box, body, part_count, quote_id, quote_body, reactions, part._id, part.ct, part.unique_id, part.width, part.height FROM MMS LEFT JOIN part ON part.mid = MMS._id WHERE thread_id={}".format(thread_id))
   msg = OrderedDict()
   for m in db_cursor.fetchall():
     msg[m[0]] = MMS(m[0],m[1],m[2],m[3],m[4],m[5],m[6],m[7],m[8],m[9],m[10],m[11])
 
-  db_cursor.execute("select thread_id, address, date_sent, type, body, reactions FROM sms where thread_id=={}".format(THREAD_ID))
+  db_cursor.execute("select thread_id, address, date_sent, type, body, reactions FROM sms where thread_id=={}".format(thread_id))
   for s in db_cursor.fetchall():
     if msg.get(s[2]):
       raise ValueError
@@ -25,7 +25,7 @@ def fetch_contact_msg(contact_address, db_cursor):
   return msg
   
 def fetch_part_used(db_cursor):
-  db_cursor.execute("select part._id, part.ct, part.unique_id, part.width, part.height FROM PART INNER JOIN mms ON part.mid = mms._id WHERE thread_id={}".format(THREAD_ID))
+  db_cursor.execute("select part._id, part.ct, part.unique_id, part.width, part.height FROM PART INNER JOIN mms ON part.mid = mms._id WHERE thread_id={}".format(thread_id))
   part = OrderedDict()
   for p in db_cursor.fetchall():
     part[p[0]] = PART(p[0],p[1],p[2],p[3],p[4])
@@ -180,20 +180,16 @@ if __name__ == "__main__":
   parser.add_argument("--out", "-o", dest="html_output_file", help="html output file", type=str)
   args = parser.parse_args()
 
-  THREAD_ID = args.thread_id
-  CONTACT_ADDRESS = args.contact_address
   CONTACT_NAME = args.contact_name
   MYSELF = args.your_name
-  ATTACHMENT_DIR = args.attachment_dir
-  DB_PATH = args.db_path
-  HTML_OUT = args.html_output_file
+  ATTACHMENT_DIR = args.attachment_dir+'/'
   
-  conn = sqlite3.connect(DB_PATH)
+  conn = sqlite3.connect(args.db_path)
   db_cursor = conn.cursor()
 
-  msg_dict = OrderedDict(sorted(fetch_contact_msg(CONTACT_ADDRESS, db_cursor).items()))
+  msg_dict = OrderedDict(sorted(fetch_contact_msg(args.contact_address, db_cursor, args.thread_id).items()))
 
-  save_msg(HTML_OUT, msg_dict)
+  save_msg(args.html_output_file, msg_dict)
   test_css()
 
 
