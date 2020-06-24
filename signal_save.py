@@ -46,7 +46,7 @@ def fetch_part_used(db_cursor):
 def build_header():
   return HEAD + NAVBAR
 
-def build_msg(contact_name, date, msg, filename=None, contact_quoted=None, quote=None, quote_date=None):
+def build_msg(contact_name, date, msg, filename=None, contact_quoted=None, quote=None, quote_date=None, reaction=None):
   if contact_name == CONTACT_NAME:
     offset = "offset-md-5"
     css = "mycontact"
@@ -74,7 +74,7 @@ def build_msg(contact_name, date, msg, filename=None, contact_quoted=None, quote
 
   # SMS
   else:
-    return SMS_CSS.format(contact_name = contact_name, date = date, msg = msg, css = css, offset = offset)
+    return SMS_CSS.format(contact_name = contact_name, date = date, msg = msg, css = css, offset = offset, reaction=REACTION.format(css=css,reaction=reaction))
 
 def build_footer():
   return  FOOTER
@@ -85,8 +85,8 @@ msg = OrderedDict(sorted(fetch_contact_msg(CONTACT_ADDRESS, db_cursor).items()))
 html_result = open('gabrielle.html','w')
 html_result.write(build_header())
 
-html_result.write(build_msg(CONTACT_NAME, '1583604356792', "Je t'aime"))
-html_result.write(build_msg(MYSELF, '1583604356792', "Je t'aime"))
+html_result.write(build_msg(CONTACT_NAME, '1583604356792', "Je t'aime", reaction="toto"))
+html_result.write(build_msg(MYSELF, '1583604356792', "Je t'aime", reaction="tata"))
 
 html_result.write(build_msg(CONTACT_NAME, '1583604356792', "Je t'aime", filename='20200315_120238.jpg'))
 html_result.write(build_msg(MYSELF, '1583604356792', "Je t'aime", filename='20200315_120238.jpg'))
@@ -104,11 +104,9 @@ html_result.close()
 
 html_result = open('test.html','w')
 html_result.write(build_header())
-set_trace()
 
 for msg_key, msgi in msg.items():
   msg_date = datetime.fromtimestamp(msg_key//1000)
-  print(msgi)
 
   if isinstance(msgi, SMS):
     if msgi.sms_type == SMS_RECV:
