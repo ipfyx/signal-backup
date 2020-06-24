@@ -1,5 +1,11 @@
 from functools import total_ordering
 
+SMS_SENT = 10485783
+SMS_RECV = 10485780
+
+SMS_NULL = [10747924,10747927,2,1,3]
+
+
 @total_ordering
 class MMS(object):
   def __init__(self, date, mms_type, body, part_count, quote_id, quote_body, reactions, mms_id, part_ct, part_unique_id, part_width, part_height):
