@@ -135,7 +135,7 @@ for msg_key, msgi in msg.items():
         # MMS can quote an MMS
         elif isinstance(quoted_msg, MMS):
           # MMS quote an MMS with an image
-          if quoted_msg is msg.keys() and quoted_mms.filename is not None:
+          if quoted_msg.date in msg.keys() and quoted_msg.filename is not None:
             html_result.write(build_msg(CONTACT_NAME, msg_date, msgi.body, contact_quoted=MYSELF, filename=PATH_ATTACHMENTS + quoted_msg.filename, quote= msgi.quote_body, quote_date=quoted_msg.date, reaction=msgi.reactions))
           # MMS quote an MMS without an image
           else:
@@ -159,7 +159,7 @@ for msg_key, msgi in msg.items():
         # MMS can quote an MMS
         elif isinstance(quoted_msg, MMS):
           # MMS quote an MMS with an image
-          if quoted_msg is msg.keys() and quoted_mms.filename is not None:
+          if quoted_msg.date in msg.keys() and quoted_msg.filename is not None:
             html_result.write(build_msg(MYSELF, msg_date, msgi.body, contact_quoted=CONTACT_NAME, filename=PATH_ATTACHMENTS + quoted_msg.filename, quote= msgi.quote_body, quote_date=quoted_msg.date, reaction=msgi.reactions))
           # MMS quote an MMS without an image
           else:
