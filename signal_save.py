@@ -72,24 +72,24 @@ def build_msg(contact_name, date, msg, filename=None, contact_quoted=None, quote
 def build_footer():
   return  FOOTER
 
-### TEST ###
-#html_result = open('gabrielle.html','w')
-#html_result.write(build_header())
-#
-#html_result.write(build_msg(CONTACT_NAME, '1583604356792', "Je t'aime", reaction="toto"))
-#html_result.write(build_msg(MYSELF, '1583604356792', "Je t'aime", reaction="tata"))
-#
-#html_result.write(build_msg(CONTACT_NAME, '1583604356792', "Je t'aime", filename='20200315_120238.jpg'))
-#html_result.write(build_msg(MYSELF, '1583604356792', "Je t'aime", filename='20200315_120238.jpg'))
-#
-#html_result.write(build_msg(CONTACT_NAME, '1583604356792', "Je t'aime", contact_quoted=MYSELF, quote="Je t'aime", quote_date='1583604356792'))
-#html_result.write(build_msg(MYSELF, '1583604356792', "Je t'aime", contact_quoted=CONTACT_NAME, quote="Je t'aime", quote_date='1583604356792'))
-#
-#html_result.write(build_msg(CONTACT_NAME, '1583604356792', "Je t'aime", contact_quoted=MYSELF, filename='20200315_120238.jpg', quote="Je t'aime" ,quote_date='1583604356792'))
-#html_result.write(build_msg(MYSELF, '1583604356792', "Je t'aime", contact_quoted=CONTACT_NAME, quote="Je t'aime", filename='20200315_120238.jpg', quote_date='1583604356792'))
-#
-#html_result.write(build_footer())
-#html_result.close()
+def test_css():
+  html_result = open('gabrielle.html','w')
+  html_result.write(build_header())
+  
+  html_result.write(build_msg(CONTACT_NAME, '1583604356792', "Je t'aime", reaction="toto"))
+  html_result.write(build_msg(MYSELF, '1583604356792', "Je t'aime", reaction="tata"))
+  
+  html_result.write(build_msg(CONTACT_NAME, '1583604356792', "Je t'aime", filename='20200315_120238.jpg'))
+  html_result.write(build_msg(MYSELF, '1583604356792', "Je t'aime", filename='20200315_120238.jpg'))
+  
+  html_result.write(build_msg(CONTACT_NAME, '1583604356792', "Je t'aime", contact_quoted=MYSELF, quote="Je t'aime", quote_date='1583604356792'))
+  html_result.write(build_msg(MYSELF, '1583604356792', "Je t'aime", contact_quoted=CONTACT_NAME, quote="Je t'aime", quote_date='1583604356792'))
+  
+  html_result.write(build_msg(CONTACT_NAME, '1583604356792', "Je t'aime", contact_quoted=MYSELF, filename='20200315_120238.jpg', quote="Je t'aime" ,quote_date='1583604356792'))
+  html_result.write(build_msg(MYSELF, '1583604356792', "Je t'aime", contact_quoted=CONTACT_NAME, quote="Je t'aime", filename='20200315_120238.jpg', quote_date='1583604356792'))
+  
+  html_result.write(build_footer())
+  html_result.close()
 
 def save_msg(output_file, msg_dict):
 
@@ -194,6 +194,7 @@ if __name__ == "__main__":
   msg_dict = OrderedDict(sorted(fetch_contact_msg(CONTACT_ADDRESS, db_cursor).items()))
 
   save_msg(HTML_OUT, msg_dict)
+  test_css()
 
 
 
