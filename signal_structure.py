@@ -10,7 +10,9 @@ class MMS(object):
     self.quote_id = quote_id
     self.quote_body = quote_body
     if reactions:
-      self.reactions = reactions[:11].decode('utf-8')
+      self.reactions = reactions[:11].decode('utf-8')[4]
+      if self.reactions == '❤':
+        self.reactions = '❤️'
     else:
       self.reactions = reactions
 
@@ -48,7 +50,9 @@ class SMS(object):
     self.thread_id = thread_id
     self.address = address
     if reactions:
-      self.reactions = reactions[:11].decode('utf-8')
+      self.reactions = reactions[:11].decode('utf-8')[4]
+      if self.reactions == '❤':
+        self.reactions = '❤️'
     else:
       self.reactions = reactions
 

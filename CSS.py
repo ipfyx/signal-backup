@@ -2,6 +2,7 @@ HEAD = """
   <!DOCTYPE html>
   <html>
     <head>
+      <meta charset='utf-8'>
       <link href="bootstrap-4.4.1-dist/css/bootstrap.css" rel="stylesheet">
       <link href="signal.css" rel="stylesheet">
     </head>
@@ -86,12 +87,13 @@ MMS_QUOTE_IMG = """
         </div>
         </div>
 	{msg}
+        {reaction}
         </div>
       </section>
   """
 
-REACTION = """
-          <div class="col-md-3 react_{css} offset-md-9">
+REACTION_CSS = """
+          <div class="col-md-2 react_{css} offset-md-10">
           {reaction}
           </div>
   """
