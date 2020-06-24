@@ -32,6 +32,7 @@ SMS_CSS = """
             {contact_name} - {date}
           </div>
           {msg}
+          {reaction}
           </div>
         </section>
   """
@@ -86,3 +87,10 @@ MMS_QUOTE_IMG = """
         </div>
       </section>
   """
+
+REACTION = """
+          <div class="col-md-3 react_{css} offset-md-9">
+          {reaction}
+          </div>
+  """
+
