@@ -1,6 +1,7 @@
 attachment/
 avatar/
 config/
+out/
 signal_backup.db
 stickers/
 *.html
