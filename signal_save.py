@@ -2,25 +2,39 @@
 # coding: utf8
 
 import sqlite3
+import argparse
 from pdb import pm,set_trace
 from datetime import datetime
 from collections import OrderedDict
 from CSS import *
-from signal_structure import MMS, SMS, PART
+from signal_structure import MMS, SMS, PART, SMS_SENT, SMS_RECV, SMS_NULL
 
-conn = sqlite3.connect('./out2/signal_backup.db')
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--db", dest="db_path", help="Path to signal_backup.db file", type=str)
+parser.add_argument("--attachment", "-a", dest="attachment_dir", help="Path to attachment directory", type=str)
+parser.add_argument("--thread", "-t", dest="thread_id", help="Conversation ID, multiple conversion saving are not yet supported", type=int)
+parser.add_argument("--contact_addr", "-ca", dest="contact_address", help="Contact address, multiple conversion saving are not yet supported", type=int)
+parser.add_argument("--contact_name", "-cn", dest="contact_name", help="Name of the contact you wish to display", type=str)
+parser.add_argument("--you", "-m", dest="your_name", help="Your name", type=str)
+args = parser.parse_args()
+
+#THREAD_ID = 25
+#CONTACT_ADDRESS = 102
+#CONTACT_NAME = 'Gabrielle'
+#MYSELF = 'Florian'
+#PATH_ATTACHMENTS = './out2/attachment/'
+
+THREAD_ID = args.thread_id
+CONTACT_ADDRESS = args.contact_address
+CONTACT_NAME = args.contact_name
+MYSELF = args.your_name
+ATTACHMENT_DIR = args.attachment_dir
+DB_PATH = args.db_path
+
+conn = sqlite3.connect(DB_PATH)
 db_cursor = conn.cursor()
 
-THREAD_ID = 25
-CONTACT_ADDRESS = 102
-CONTACT_NAME = 'Gabrielle'
-MYSELF = 'Florian'
-PATH_ATTACHMENTS = './out2/attachment/'
-
-SMS_SENT = 10485783
-SMS_RECV = 10485780
-
-SMS_NULL = [10747924,10747927,2,1,3]
 def fetch_contact_msg(contact_address, db_cursor):
   # MMS
   db_cursor.execute("select date, msg_box, body, part_count, quote_id, quote_body, reactions, part._id, part.ct, part.unique_id, part.width, part.height FROM MMS LEFT JOIN part ON part.mid = MMS._id WHERE thread_id={}".format(THREAD_ID))
@@ -136,7 +150,7 @@ for msg_key, msgi in msg.items():
         elif isinstance(quoted_msg, MMS):
           # MMS quote an MMS with an image
           if quoted_msg.date in msg.keys() and quoted_msg.filename is not None:
-            html_result.write(build_msg(CONTACT_NAME, msg_date, msgi.body, contact_quoted=MYSELF, filename=PATH_ATTACHMENTS + quoted_msg.filename, quote= msgi.quote_body, quote_date=quoted_msg.date, reaction=msgi.reactions))
+            html_result.write(build_msg(CONTACT_NAME, msg_date, msgi.body, contact_quoted=MYSELF, filename=ATTACHMENT_DIR + quoted_msg.filename, quote= msgi.quote_body, quote_date=quoted_msg.date, reaction=msgi.reactions))
           # MMS quote an MMS without an image
           else:
             html_result.write(build_msg(CONTACT_NAME, msg_date, msgi.body, contact_quoted=MYSELF, quote=msgi.quote_body, quote_date=quoted_msg.date, reaction=msgi.reactions))
@@ -144,7 +158,7 @@ for msg_key, msgi in msg.items():
           html_result.write(build_msg(CONTACT_NAME, msg_date, msgi.body, contact_quoted=MYSELF, quote="NULL quote", quote_date=None, reaction=msgi.reactions))
       # MMS is embedding a simple MMS without quoting
       elif msgi.filename is not None:
-        html_result.write(build_msg(CONTACT_NAME, msg_date, msgi.body, filename=PATH_ATTACHMENTS + msgi.filename, reaction=msgi.reactions))
+        html_result.write(build_msg(CONTACT_NAME, msg_date, msgi.body, filename=ATTACHMENT_DIR + msgi.filename, reaction=msgi.reactions))
       else:
         raise ValueError
 
@@ -160,7 +174,7 @@ for msg_key, msgi in msg.items():
         elif isinstance(quoted_msg, MMS):
           # MMS quote an MMS with an image
           if quoted_msg.date in msg.keys() and quoted_msg.filename is not None:
-            html_result.write(build_msg(MYSELF, msg_date, msgi.body, contact_quoted=CONTACT_NAME, filename=PATH_ATTACHMENTS + quoted_msg.filename, quote= msgi.quote_body, quote_date=quoted_msg.date, reaction=msgi.reactions))
+            html_result.write(build_msg(MYSELF, msg_date, msgi.body, contact_quoted=CONTACT_NAME, filename=ATTACHMENT_DIR + quoted_msg.filename, quote= msgi.quote_body, quote_date=quoted_msg.date, reaction=msgi.reactions))
           # MMS quote an MMS without an image
           else:
             html_result.write(build_msg(MYSELF, msg_date, msgi.body, contact_quoted=CONTACT_NAME, quote=msgi.quote_body, quote_date=quoted_msg.date, reaction=msgi.reactions))
@@ -168,7 +182,7 @@ for msg_key, msgi in msg.items():
           html_result.write(build_msg(MYSELF, msg_date, msgi.body, contact_quoted=CONTACT_NAME, quote="NULL quote", quote_date=None, reaction=msgi.reactions))
       # MMS is embedding a simple MMS without quoting
       elif msgi.filename is not None:
-        html_result.write(build_msg(MYSELF, msg_date, msgi.body, filename=PATH_ATTACHMENTS + msgi.filename, reaction=msgi.reactions))
+        html_result.write(build_msg(MYSELF, msg_date, msgi.body, filename=ATTACHMENT_DIR + msgi.filename, reaction=msgi.reactions))
       else:
         raise ValueError
 
