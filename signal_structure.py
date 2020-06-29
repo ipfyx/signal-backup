@@ -76,8 +76,8 @@ class PART(object):
     self.unique_id = unique_id
 
     if unique_id is not None:
-      assert(mms_id is not None)
-      self.filename = str(part_unique_id) + "_" + str(id_part)
+      assert(id_part is not None)
+      self.filename = str(unique_id) + "_" + str(id_part)
     else:
       self.filename = None
 
