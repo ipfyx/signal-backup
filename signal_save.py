@@ -69,6 +69,41 @@ def build_msg(contact_name, date, msg, filename=None, contact_quoted=None, quote
   else:
     return SMS_CSS.format(contact_name = contact_name, date = date, msg = msg, css = css, offset = offset, reaction=reaction)
 
+def build_msg2(contact_name, date, msg, filename=None, contact_quoted=None, quote=None, quote_date=None, quote_filename=None, reactions=None):
+  if contact_name == CONTACT_NAME:
+    offset = "offset-md-5"
+    css = "mycontact"
+  elif contact_name == MYSELF:
+    offset = ""
+    css = "myself"
+  else:
+    raise ValueError
+
+  if reactions:
+    reactions_css = REACTION_CSS.format(css=css,reactions=reactions)
+  else:
+    reactions_css = ''
+
+  if filename:
+    filename_css = FILENAME.format(filename=ATTACHMENT_DIR+filename)
+  else:
+    filename_css = ''
+
+  if quote_date:
+    assert(quote is not None)
+    assert(contact_quoted is not None)
+    quote_date = datetime.fromtimestamp(int(quote_date)//1000)
+    if quote_filename:
+      quote_filename_css = FILENAME.format(filename=ATTACHMENT_DIR+quote_filename)
+    else:
+      quote_filename_css = ''
+    quote_css = QUOTE.format(contact_quoted = contact_quoted, quote = quote, quote_date = quote_date, css = css, filename = quote_filename_css, offset = offset)
+  else:
+    quote_css = ''
+
+  return TEMPLATE.format(contact_name = contact_name, date = date, quoted_msg = quote_css, msg_sent = msg, filename_sent = filename_css, css = css, offset = offset, reactions=reactions_css)
+
+
 def build_footer():
   return  FOOTER
 
@@ -90,6 +125,44 @@ def test_css():
   
   html_result.write(build_footer())
   html_result.close()
+
+def save_msg2(output_file, msg_dict):
+
+  html_result = open(output_file,'w')
+  html_result.write(build_header())
+
+  for msg_key, msgi in msg_dict.items():
+    msg_date = datetime.fromtimestamp(msg_key//1000)
+
+    if msgi.msg_type == SMS_RECV:
+      if isinstance(msgi, SMS):
+        html_result.write(build_msg2(CONTACT_NAME, msg_date, msgi.body, reactions=msgi.reactions))
+      elif isinstance(msgi, MMS):
+        quoted_msg = msg_dict.get(msgi.quote_id)
+        if isinstance(quoted_msg, MMS) and quoted_msg.date in msg_dict.keys():
+          html_result.write(build_msg2(CONTACT_NAME, msg_date, msgi.body, filename=msgi.filename, contact_quoted=MYSELF, quote_filename=quoted_msg.filename, quote= msgi.quote_body, quote_date=quoted_msg.date, reactions=msgi.reactions))
+        else:
+          html_result.write(build_msg2(CONTACT_NAME, msg_date, msgi.body, filename=msgi.filename, reactions=msgi.reactions))
+
+    elif msgi.msg_type == SMS_SENT:
+      if isinstance(msgi, SMS):
+        html_result.write(build_msg2(MYSELF, msg_date, msgi.body, reactions=msgi.reactions))
+      elif isinstance(msgi, MMS):
+        quoted_msg = msg_dict.get(msgi.quote_id)
+        if isinstance(quoted_msg, MMS) and quoted_msg.date in msg_dict.keys():
+          html_result.write(build_msg2(MYSELF, msg_date, msgi.body, filename=msgi.filename, contact_quoted=CONTACT_NAME, quote_filename=quoted_msg.filename, quote= msgi.quote_body, quote_date=quoted_msg.date, reactions=msgi.reactions))
+        else:
+          html_result.write(build_msg2(MYSELF, msg_date, msgi.body, filename=msgi.filename, reactions=msgi.reactions))
+
+    elif msgi.msg_type in SMS_NULL:
+        pass
+    else:
+        raise ValueError(msgi.msg_type)
+  
+  html_result.write(build_footer())
+  html_result.close()
+
+
 
 def save_msg(output_file, msg_dict):
 
