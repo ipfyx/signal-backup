@@ -176,7 +176,7 @@ QUOTE = """
         {contact_quoted} - {quote_date}
 	  <!-- Quoted msg and file -->
           <div class="col-md-12 quote_{css}">
-	  {filename}
+	  {quote_filename}
           {quote}
           </div>
         </div>
