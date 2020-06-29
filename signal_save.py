@@ -69,7 +69,7 @@ def build_msg(contact_name, date, msg, filename=None, contact_quoted=None, quote
   else:
     return SMS_CSS.format(contact_name = contact_name, date = date, msg = msg, css = css, offset = offset, reaction=reaction)
 
-def build_msg2(contact_name, date, msg, filename=None, contact_quoted=None, quote=None, quote_date=None, quote_filename=None, reactions=None):
+def build_msg2(contact_name, date, msg, filename=None, part_count=None, contact_quoted=None, quote=None, quote_date=None, quote_filename=None, reactions=None):
   if contact_name == CONTACT_NAME:
     offset = "offset-md-5"
     css = "mycontact"
@@ -83,12 +83,7 @@ def build_msg2(contact_name, date, msg, filename=None, contact_quoted=None, quot
     reactions_css = REACTION_CSS.format(css=css,reactions=reactions)
   else:
     reactions_css = ''
-
-  if filename:
-    filename_css = FILENAME.format(filename=ATTACHMENT_DIR+filename)
-  else:
-    filename_css = ''
-
+  
   if quote_date:
     assert(quote is not None)
     assert(contact_quoted is not None)
@@ -97,9 +92,14 @@ def build_msg2(contact_name, date, msg, filename=None, contact_quoted=None, quot
       quote_filename_css = FILENAME.format(filename=ATTACHMENT_DIR+quote_filename)
     else:
       quote_filename_css = ''
-    quote_css = QUOTE.format(contact_quoted = contact_quoted, quote = quote, quote_date = quote_date, css = css, filename = quote_filename_css, offset = offset)
+    quote_css = QUOTE.format(contact_quoted = contact_quoted, quote = quote, quote_date = quote_date, css = css, quote_filename = quote_filename_css, offset = offset)
   else:
     quote_css = ''
+
+  if filename:
+    filename_css = FILENAME.format(filename=ATTACHMENT_DIR+filename)
+  else:
+    filename_css = ''
 
   return TEMPLATE.format(contact_name = contact_name, date = date, quoted_msg = quote_css, msg_sent = msg, filename_sent = filename_css, css = css, offset = offset, reactions=reactions_css)
 
@@ -140,9 +140,9 @@ def save_msg2(output_file, msg_dict):
       elif isinstance(msgi, MMS):
         quoted_msg = msg_dict.get(msgi.quote_id)
         if isinstance(quoted_msg, MMS) and quoted_msg.date in msg_dict.keys():
-          html_result.write(build_msg2(CONTACT_NAME, msg_date, msgi.body, filename=msgi.filename, contact_quoted=MYSELF, quote_filename=quoted_msg.filename, quote= msgi.quote_body, quote_date=quoted_msg.date, reactions=msgi.reactions))
+          html_result.write(build_msg2(CONTACT_NAME, msg_date, msgi.body, part_count=msgi.part_count, filename=msgi.filename, contact_quoted=MYSELF, quote_filename=quoted_msg.filename, quote= msgi.quote_body, quote_date=quoted_msg.date, reactions=msgi.reactions))
         else:
-          html_result.write(build_msg2(CONTACT_NAME, msg_date, msgi.body, filename=msgi.filename, reactions=msgi.reactions))
+          html_result.write(build_msg2(CONTACT_NAME, msg_date, msgi.body, part_count=msgi.part_count, filename=msgi.filename, reactions=msgi.reactions))
 
     elif msgi.msg_type == SMS_SENT:
       if isinstance(msgi, SMS):
@@ -150,9 +150,9 @@ def save_msg2(output_file, msg_dict):
       elif isinstance(msgi, MMS):
         quoted_msg = msg_dict.get(msgi.quote_id)
         if isinstance(quoted_msg, MMS) and quoted_msg.date in msg_dict.keys():
-          html_result.write(build_msg2(MYSELF, msg_date, msgi.body, filename=msgi.filename, contact_quoted=CONTACT_NAME, quote_filename=quoted_msg.filename, quote= msgi.quote_body, quote_date=quoted_msg.date, reactions=msgi.reactions))
+          html_result.write(build_msg2(MYSELF, msg_date, msgi.body, part_count=msgi.part_count, filename=msgi.filename, contact_quoted=CONTACT_NAME, quote_filename=quoted_msg.filename, quote= msgi.quote_body, quote_date=quoted_msg.date, reactions=msgi.reactions))
         else:
-          html_result.write(build_msg2(MYSELF, msg_date, msgi.body, filename=msgi.filename, reactions=msgi.reactions))
+          html_result.write(build_msg2(MYSELF, msg_date, msgi.body, part_count=msgi.part_count, filename=msgi.filename, reactions=msgi.reactions))
 
     elif msgi.msg_type in SMS_NULL:
         pass
