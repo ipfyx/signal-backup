@@ -111,9 +111,9 @@ def save_msg(output_file, msg_dict):
       elif isinstance(msgi, MMS):
         quoted_msg = msg_dict.get(msgi.quote_id)
         if isinstance(quoted_msg, MMS) and quoted_msg.date in msg_dict.keys():
-          html_result.write(build_msg(CONTACT_NAME, msg_date, msgi.body, part_count=msgi.part_count, filename=msgi.filename, contact_quoted=MYSELF, quote_filename=quoted_msg.filename, quote= msgi.quote_body, quote_date=quoted_msg.date, reactions=msgi.reactions))
+          html_result.write(build_msg(CONTACT_NAME, msg_date, msgi.body, part_count=msgi.part_count, filename=msgi.part.filename, contact_quoted=MYSELF, quote_filename=quoted_msg.part.filename, quote= msgi.quote_body, quote_date=quoted_msg.date, reactions=msgi.reactions))
         else:
-          html_result.write(build_msg(CONTACT_NAME, msg_date, msgi.body, part_count=msgi.part_count, filename=msgi.filename, reactions=msgi.reactions))
+          html_result.write(build_msg(CONTACT_NAME, msg_date, msgi.body, part_count=msgi.part_count, filename=msgi.part.filename, reactions=msgi.reactions))
 
     elif msgi.msg_type == SMS_SENT:
       if isinstance(msgi, SMS):
@@ -121,9 +121,9 @@ def save_msg(output_file, msg_dict):
       elif isinstance(msgi, MMS):
         quoted_msg = msg_dict.get(msgi.quote_id)
         if isinstance(quoted_msg, MMS) and quoted_msg.date in msg_dict.keys():
-          html_result.write(build_msg(MYSELF, msg_date, msgi.body, part_count=msgi.part_count, filename=msgi.filename, contact_quoted=CONTACT_NAME, quote_filename=quoted_msg.filename, quote= msgi.quote_body, quote_date=quoted_msg.date, reactions=msgi.reactions))
+          html_result.write(build_msg(MYSELF, msg_date, msgi.body, part_count=msgi.part_count, filename=msgi.part.filename, contact_quoted=CONTACT_NAME, quote_filename=quoted_msg.part.filename, quote=msgi.quote_body, quote_date=quoted_msg.date, reactions=msgi.reactions))
         else:
-          html_result.write(build_msg(MYSELF, msg_date, msgi.body, part_count=msgi.part_count, filename=msgi.filename, reactions=msgi.reactions))
+          html_result.write(build_msg(MYSELF, msg_date, msgi.body, part_count=msgi.part_count, filename=msgi.part.filename, reactions=msgi.reactions))
 
     elif msgi.msg_type in SMS_NULL:
         pass
