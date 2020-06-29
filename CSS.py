@@ -91,9 +91,89 @@ MMS_QUOTE_IMG = """
       </section>
   """
 
+IDEA = """
+      <section class="row">
+        <div class="col-md-6 msg_{css} {offset}">
+
+	<!-- Writer and date sent -->
+        <div class="col-md-12 name_{css}">
+        {contact_name} - {date}
+        </div>
+
+	<!-- Quoted contact and date sent -->
+        <div class="col-md-12 name_{css}">
+        {contact_quoted} - {quote_date}
+
+	<!-- Quoted msg and file -->
+        <div class="col-md-12 quote_{css}">
+        <a href="{filename}">
+          <img src="{filename}">
+        </a>
+        {quote}
+        </div>
+
+	<!-- Msg filename -->
+	</div>
+          <a href="{filename}">
+            <img src="{filename}">
+          </a>
+        </div>
+
+	<!-- Msg -->
+	{msg}
+
+	<!-- Reaction -->
+        {reaction}
+        </div>
+
+      </section>
+  """
+
+TEMPLATE = """
+      <section class="row">
+        <div class="col-md-6 msg_{css} {offset}">
+
+	<!-- Writer and date sent -->
+        <div class="col-md-12 name_{css}">
+        {contact_name} - {date}
+        </div>
+
+	<!-- Quoted contact and date sent -->
+        {quoted_msg} 
+
+	<!-- Msg filename -->
+	{filename_sent}	
+
+	<!-- Msg -->
+	{msg_sent}
+
+	<!-- Reaction -->
+        {reactions}
+        </div>
+
+      </section>
+  """
+
 REACTION_CSS = """
           <div class="col-md-2 react_{css} offset-md-10">
-          {reaction}
+          {reactions}
           </div>
   """
 
+# Msg filename
+FILENAME ="""
+          <a href="{filename}">
+            <img src="{filename}">
+          </a>
+"""
+
+QUOTE = """
+        <div class="col-md-12 name_{css}">
+        {contact_quoted} - {quote_date}
+	  <!-- Quoted msg and file -->
+          <div class="col-md-12 quote_{css}">
+	  {filename}
+          {quote}
+          </div>
+        </div>
+"""
