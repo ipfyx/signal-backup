@@ -37,7 +37,7 @@ class MMS(object):
     return (self.date < other.date)
   
   def __repr__(self):
-    return "date : {}, type : {}, body : {}, part_count : {}, quote_id : {}, quote_body : {}, reactions : {}, file : {}, ct : {}\n".format(self.date, self.msg_type, self.body, self.part_count, self.quote_id, self.quote_body, self.reactions, self.filename, self.part_ct)
+    return "date : {}, type : {}, body : {}, part_count : {}, quote_id : {}, quote_body : {}, reactions : {}, part : {}\n".format(self.date, self.msg_type, self.body, self.part_count, self.quote_id, self.quote_body, self.reactions, self.part)
 
 @total_ordering
 class SMS(object):
@@ -80,7 +80,6 @@ class PART(object):
       self.filename = str(part_unique_id) + "_" + str(id_part)
     else:
       self.filename = None
-
 
   def __repr__(self):
     return "id : {}, filename : {}, ct : {}, unique_id : {}".format(self.id_part, self.filename, self.ct, self.unique_id)
