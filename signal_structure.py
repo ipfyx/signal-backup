@@ -8,7 +8,7 @@ SMS_NULL = [10747924,10747927,2,1,3]
 
 @total_ordering
 class MMS(object):
-  def __init__(self, date, msg_type, body, part_count, quote_id, quote_body, reactions, mms_id, part_ct, part_unique_id, part_width, part_height):
+  def __init__(self, date, msg_type, body, part_count, quote_id, quote_body, reactions, mms_id, part_ct, part_unique_id):
     self.date = date
     self.msg_type = msg_type
     self.body = body
@@ -22,13 +22,7 @@ class MMS(object):
     else:
       self.reactions = reactions
 
-    self.part = PART(mms_id, part_ct, part_unique_id, part_width, part_height)
-
-    if part_unique_id is not None:
-      assert(mms_id is not None)
-      self.filename = str(part_unique_id) + "_" + str(mms_id)
-    else:
-      self.filename = None
+    self.part = PART(mms_id, part_ct, part_unique_id)
 
   def __str__(self):
     return self.__repr__()
@@ -43,7 +37,7 @@ class MMS(object):
     return (self.date < other.date)
   
   def __repr__(self):
-    return "date : {}, type : {}, body : {}, part_count : {}, quote_id : {}, quote_body : {}, reactions : {}, file : {}, ct : {},  width : {}, heigth : {}\n".format(self.date, self.msg_type, self.body, self.part_count, self.quote_id, self.quote_body, self.reactions, self.filename, self.part_ct, self.part_width, self.part_height)
+    return "date : {}, type : {}, body : {}, part_count : {}, quote_id : {}, quote_body : {}, reactions : {}, file : {}, ct : {}\n".format(self.date, self.msg_type, self.body, self.part_count, self.quote_id, self.quote_body, self.reactions, self.filename, self.part_ct)
 
 @total_ordering
 class SMS(object):
@@ -76,12 +70,10 @@ class SMS(object):
     return "date : {}, type : {}, body : {}, thread_id : {}, address : {}, reactions : {}\n".format(self.date, self.msg_type, self.body, self.thread_id, self.address, self.reactions)
 
 class PART(object):
-  def __init__(self, id_part, ct, unique_id, width, height):
+  def __init__(self, id_part, ct, unique_id):
     self.id_part = id_part 
     self.ct = ct 
     self.unique_id = unique_id
-    self.width = width
-    self.height = height 
 
     if unique_id is not None:
       assert(mms_id is not None)
@@ -91,7 +83,7 @@ class PART(object):
 
 
   def __repr__(self):
-    return "id : {}, filename : {}, ct : {}, unique_id : {}, width : {}, height : {}".format(self.id_part, self.filename, self.ct, self.unique_id, self.width, self.height)
+    return "id : {}, filename : {}, ct : {}, unique_id : {}".format(self.id_part, self.filename, self.ct, self.unique_id)
 
   def __str__(self):
     return self.__repr__()
