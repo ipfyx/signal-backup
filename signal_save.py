@@ -37,7 +37,7 @@ def fetch_part_used(db_cursor):
 def build_header():
   return HEAD + NAVBAR
 
-def build_msg(contact_name, date, msg, filename=None, contact_quoted=None, quote=None, quote_date=None, reaction=None):
+def build_msg(contact_name, date, msg, filename=None, part_count=None, contact_quoted=None, quote=None, quote_date=None, quote_filename=None, reactions=None):
   if contact_name == CONTACT_NAME:
     offset = "offset-md-5"
     css = "mycontact"
@@ -47,40 +47,6 @@ def build_msg(contact_name, date, msg, filename=None, contact_quoted=None, quote
   else:
     raise ValueError
 
-  if reaction:
-    reaction = REACTION_CSS.format(css=css,reaction=reaction)
-  else:
-    reaction=''
-
-  # MMS with IMG & QUOTE
-  if filename and quote_date:
-    assert(quote is not None)
-    assert(contact_quoted is not None)
-    quote_date = datetime.fromtimestamp(int(quote_date)//1000)
-    return MMS_QUOTE_IMG.format(contact_name = contact_name, date = date, msg = msg, contact_quoted = contact_quoted, quote = quote, quote_date = quote_date, css = css, filename = filename, offset = offset, reaction=reaction)
-
-  # MMS with QUOTE
-  elif quote_date:
-    quote_date = datetime.fromtimestamp(int(quote_date)//1000)
-    return MMS_QUOTE.format(contact_name = contact_name, date = date, msg = msg, contact_quoted = contact_quoted, quote = quote, quote_date = quote_date, css = css, offset = offset, reaction=reaction) 
- 
-  # MMS with IMG
-  elif filename:
-    return MMS_IMG.format(contact_name = contact_name, date = date, msg = msg, filename = filename, css = css, offset = offset, reaction=reaction)
-
-  # SMS
-  else:
-    return SMS_CSS.format(contact_name = contact_name, date = date, msg = msg, css = css, offset = offset, reaction=reaction)
-
-def build_msg2(contact_name, date, msg, filename=None, part_count=None, contact_quoted=None, quote=None, quote_date=None, quote_filename=None, reactions=None):
-  if contact_name == CONTACT_NAME:
-    offset = "offset-md-5"
-    css = "mycontact"
-  elif contact_name == MYSELF:
-    offset = ""
-    css = "myself"
-  else:
-    raise ValueError
 
   if reactions:
     reactions_css = REACTION_CSS.format(css=css,reactions=reactions)
@@ -134,7 +100,7 @@ def test_css():
   html_result.write(build_footer())
   html_result.close()
 
-def save_msg2(output_file, msg_dict):
+def save_msg(output_file, msg_dict):
 
   html_result = open(output_file,'w')
   html_result.write(build_header())
@@ -144,107 +110,28 @@ def save_msg2(output_file, msg_dict):
 
     if msgi.msg_type == SMS_RECV:
       if isinstance(msgi, SMS):
-        html_result.write(build_msg2(CONTACT_NAME, msg_date, msgi.body, reactions=msgi.reactions))
+        html_result.write(build_msg(CONTACT_NAME, msg_date, msgi.body, reactions=msgi.reactions))
       elif isinstance(msgi, MMS):
         quoted_msg = msg_dict.get(msgi.quote_id)
         if isinstance(quoted_msg, MMS) and quoted_msg.date in msg_dict.keys():
-          html_result.write(build_msg2(CONTACT_NAME, msg_date, msgi.body, part_count=msgi.part_count, filename=msgi.filename, contact_quoted=MYSELF, quote_filename=quoted_msg.filename, quote= msgi.quote_body, quote_date=quoted_msg.date, reactions=msgi.reactions))
+          html_result.write(build_msg(CONTACT_NAME, msg_date, msgi.body, part_count=msgi.part_count, filename=msgi.filename, contact_quoted=MYSELF, quote_filename=quoted_msg.filename, quote= msgi.quote_body, quote_date=quoted_msg.date, reactions=msgi.reactions))
         else:
-          html_result.write(build_msg2(CONTACT_NAME, msg_date, msgi.body, part_count=msgi.part_count, filename=msgi.filename, reactions=msgi.reactions))
+          html_result.write(build_msg(CONTACT_NAME, msg_date, msgi.body, part_count=msgi.part_count, filename=msgi.filename, reactions=msgi.reactions))
 
     elif msgi.msg_type == SMS_SENT:
       if isinstance(msgi, SMS):
-        html_result.write(build_msg2(MYSELF, msg_date, msgi.body, reactions=msgi.reactions))
+        html_result.write(build_msg(MYSELF, msg_date, msgi.body, reactions=msgi.reactions))
       elif isinstance(msgi, MMS):
         quoted_msg = msg_dict.get(msgi.quote_id)
         if isinstance(quoted_msg, MMS) and quoted_msg.date in msg_dict.keys():
-          html_result.write(build_msg2(MYSELF, msg_date, msgi.body, part_count=msgi.part_count, filename=msgi.filename, contact_quoted=CONTACT_NAME, quote_filename=quoted_msg.filename, quote= msgi.quote_body, quote_date=quoted_msg.date, reactions=msgi.reactions))
+          html_result.write(build_msg(MYSELF, msg_date, msgi.body, part_count=msgi.part_count, filename=msgi.filename, contact_quoted=CONTACT_NAME, quote_filename=quoted_msg.filename, quote= msgi.quote_body, quote_date=quoted_msg.date, reactions=msgi.reactions))
         else:
-          html_result.write(build_msg2(MYSELF, msg_date, msgi.body, part_count=msgi.part_count, filename=msgi.filename, reactions=msgi.reactions))
+          html_result.write(build_msg(MYSELF, msg_date, msgi.body, part_count=msgi.part_count, filename=msgi.filename, reactions=msgi.reactions))
 
     elif msgi.msg_type in SMS_NULL:
         pass
     else:
         raise ValueError(msgi.msg_type)
-  
-  html_result.write(build_footer())
-  html_result.close()
-
-
-
-def save_msg(output_file, msg_dict):
-
-  html_result = open(output_file,'w')
-  html_result.write(build_header())
-
-  for msg_key, msgi in msg_dict.items():
-    msg_date = datetime.fromtimestamp(msg_key//1000)
-  
-    if isinstance(msgi, SMS):
-      if msgi.msg_type == SMS_RECV:
-        html_result.write(build_msg(CONTACT_NAME, msg_date, msgi.body, reaction=msgi.reactions))
-      elif msgi.msg_type == SMS_SENT:
-        html_result.write(build_msg(MYSELF, msg_date, msgi.body, reaction=msgi.reactions))
-      elif msgi.msg_type in SMS_NULL:
-        pass
-      else:
-        raise ValueError(msgi.msg_type)
-  
-    elif isinstance(msgi, MMS):
-      # MMS recieved
-      if msgi.msg_type == SMS_RECV:
-        # MMS is quoting a msg
-        if msgi.quote_id > 0:
-          quoted_msg = msg_dict.get(msgi.quote_id)
-          # MMS can quote an SMS
-          if isinstance(quoted_msg, SMS):
-            html_result.write(build_msg(CONTACT_NAME, msg_date, msgi.body, contact_quoted=MYSELF, quote=msgi.quote_body, quote_date=quoted_msg.date, reaction=msgi.reactions))
-          # MMS can quote an MMS
-          elif isinstance(quoted_msg, MMS):
-            # MMS quote an MMS with an image
-            if quoted_msg.date in msg_dict.keys() and quoted_msg.filename is not None:
-              html_result.write(build_msg(CONTACT_NAME, msg_date, msgi.body, contact_quoted=MYSELF, filename=ATTACHMENT_DIR + quoted_msg.filename, quote= msgi.quote_body, quote_date=quoted_msg.date, reaction=msgi.reactions))
-            # MMS quote an MMS without an image
-            else:
-              html_result.write(build_msg(CONTACT_NAME, msg_date, msgi.body, contact_quoted=MYSELF, quote=msgi.quote_body, quote_date=quoted_msg.date, reaction=msgi.reactions))
-          else:
-            html_result.write(build_msg(CONTACT_NAME, msg_date, msgi.body, contact_quoted=MYSELF, quote="NULL quote", quote_date=None, reaction=msgi.reactions))
-        # MMS is embedding a simple MMS without quoting
-        elif msgi.filename is not None:
-          html_result.write(build_msg(CONTACT_NAME, msg_date, msgi.body, filename=ATTACHMENT_DIR + msgi.filename, reaction=msgi.reactions))
-        else:
-          raise ValueError
-  
-      # MMS sent
-      elif msgi.msg_type == SMS_SENT:
-        # MMS is quoting a msg
-        if msgi.quote_id > 0:
-          quoted_msg = msg_dict.get(msgi.quote_id)
-          # MMS can quote an SMS
-          if isinstance(quoted_msg, SMS):
-            html_result.write(build_msg(MYSELF, msg_date, msgi.body, contact_quoted=CONTACT_NAME, quote=msgi.quote_body, quote_date=quoted_msg.date, reaction=msgi.reactions))
-          # MMS can quote an MMS
-          elif isinstance(quoted_msg, MMS):
-            # MMS quote an MMS with an image
-            if quoted_msg.date in msg_dict.keys() and quoted_msg.filename is not None:
-              html_result.write(build_msg(MYSELF, msg_date, msgi.body, contact_quoted=CONTACT_NAME, filename=ATTACHMENT_DIR + quoted_msg.filename, quote= msgi.quote_body, quote_date=quoted_msg.date, reaction=msgi.reactions))
-            # MMS quote an MMS without an image
-            else:
-              html_result.write(build_msg(MYSELF, msg_date, msgi.body, contact_quoted=CONTACT_NAME, quote=msgi.quote_body, quote_date=quoted_msg.date, reaction=msgi.reactions))
-          else:
-            html_result.write(build_msg(MYSELF, msg_date, msgi.body, contact_quoted=CONTACT_NAME, quote="NULL quote", quote_date=None, reaction=msgi.reactions))
-        # MMS is embedding a simple MMS without quoting
-        elif msgi.filename is not None:
-          html_result.write(build_msg(MYSELF, msg_date, msgi.body, filename=ATTACHMENT_DIR + msgi.filename, reaction=msgi.reactions))
-        else:
-          raise ValueError
-  
-      elif msgi.msg_type in SMS_NULL:
-        pass
-      else:
-        raise ValueError(msgi)
-    else:
-      raise ValueError
   
   html_result.write(build_footer())
   html_result.close()
