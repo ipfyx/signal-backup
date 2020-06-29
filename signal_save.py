@@ -173,18 +173,18 @@ def save_msg(output_file, msg_dict):
     msg_date = datetime.fromtimestamp(msg_key//1000)
   
     if isinstance(msgi, SMS):
-      if msgi.sms_type == SMS_RECV:
+      if msgi.msg_type == SMS_RECV:
         html_result.write(build_msg(CONTACT_NAME, msg_date, msgi.body, reaction=msgi.reactions))
-      elif msgi.sms_type == SMS_SENT:
+      elif msgi.msg_type == SMS_SENT:
         html_result.write(build_msg(MYSELF, msg_date, msgi.body, reaction=msgi.reactions))
-      elif msgi.sms_type in SMS_NULL:
+      elif msgi.msg_type in SMS_NULL:
         pass
       else:
-        raise ValueError(msgi.sms_type)
+        raise ValueError(msgi.msg_type)
   
     elif isinstance(msgi, MMS):
       # MMS recieved
-      if msgi.mms_type == SMS_RECV:
+      if msgi.msg_type == SMS_RECV:
         # MMS is quoting a msg
         if msgi.quote_id > 0:
           quoted_msg = msg_dict.get(msgi.quote_id)
@@ -208,7 +208,7 @@ def save_msg(output_file, msg_dict):
           raise ValueError
   
       # MMS sent
-      elif msgi.mms_type == SMS_SENT:
+      elif msgi.msg_type == SMS_SENT:
         # MMS is quoting a msg
         if msgi.quote_id > 0:
           quoted_msg = msg_dict.get(msgi.quote_id)
@@ -231,7 +231,7 @@ def save_msg(output_file, msg_dict):
         else:
           raise ValueError
   
-      elif msgi.mms_type in SMS_NULL:
+      elif msgi.msg_type in SMS_NULL:
         pass
       else:
         raise ValueError(msgi)
