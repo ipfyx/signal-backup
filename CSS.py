@@ -38,6 +38,7 @@ SMS_CSS = """
         </section>
   """
 
+# MMS with a simple IMG and some text
 MMS_IMG = """
       <section class="row">
         <div class="col-md-6 msg_{css} {offset}">
@@ -53,6 +54,7 @@ MMS_IMG = """
       </section>
   """
 
+# MMS with a simple text QUOTE and some text
 MMS_QUOTE = """
       <section class="row">
         <div class="col-md-6 msg_{css} {offset}">
@@ -70,6 +72,8 @@ MMS_QUOTE = """
         </div>
       </section>
   """
+
+# MMS with a quote with a file and some text
 MMS_QUOTE_IMG = """
       <section class="row">
         <div class="col-md-6 msg_{css} {offset}">
