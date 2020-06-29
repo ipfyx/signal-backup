@@ -78,7 +78,6 @@ MMS_QUOTE_IMG = """
         </div>
         <div class="col-md-12 name_{css}">
         {contact_quoted} - {quote_date}
-	{quote}
         <div class="col-md-12 quote_{css}">
         <a href="{filename}">
           <img src="{filename}">
