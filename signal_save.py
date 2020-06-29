@@ -96,10 +96,17 @@ def build_msg2(contact_name, date, msg, filename=None, part_count=None, contact_
   else:
     quote_css = ''
 
-  if filename:
+  if filename and part_count>1:
+    filename_css = FILENAME.format(filename=ATTACHMENT_DIR+filename)
+  elif filename and msg == '':
+    assert(part_count==0)
+    print(filename)
     filename_css = FILENAME.format(filename=ATTACHMENT_DIR+filename)
   else:
     filename_css = ''
+
+  if msg == '' and not filename:
+    return ''
 
   return TEMPLATE.format(contact_name = contact_name, date = date, quoted_msg = quote_css, msg_sent = msg, filename_sent = filename_css, css = css, offset = offset, reactions=reactions_css)
 
