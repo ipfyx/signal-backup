@@ -22,9 +22,7 @@ class MMS(object):
     else:
       self.reactions = reactions
 
-    self.part_ct = part_ct
-    self.part_width = part_width
-    self.part_height = part_height
+    self.part = PART(mms_id, part_ct, part_unique_id, part_width, part_height)
 
     if part_unique_id is not None:
       assert(mms_id is not None)
@@ -84,7 +82,13 @@ class PART(object):
     self.unique_id = unique_id
     self.width = width
     self.height = height 
-    self.filename = str(unique_id) + '_' + str(id_part)
+
+    if unique_id is not None:
+      assert(mms_id is not None)
+      self.filename = str(part_unique_id) + "_" + str(id_part)
+    else:
+      self.filename = None
+
 
   def __repr__(self):
     return "id : {}, filename : {}, ct : {}, unique_id : {}, width : {}, height : {}".format(self.id_part, self.filename, self.ct, self.unique_id, self.width, self.height)
