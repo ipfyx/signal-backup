@@ -41,7 +41,7 @@ def build_header():
 def build_footer():
   return  FOOTER
 
-def build_msg(contact_name, date, msg, filename=None, part_count=None, contact_quoted=None, quote=None, quote_date=None, quote_filename=None, reactions=None):
+def build_msg(contact_name, contact_quoted, msg):
   if contact_name == CONTACT_NAME:
     offset = "offset-md-5"
     css = "mycontact"
@@ -51,36 +51,38 @@ def build_msg(contact_name, date, msg, filename=None, part_count=None, contact_q
   else:
     raise ValueError
 
+  msg_date = datetime.fromtimestamp(int(msg.date)//1000)
+
   reactions_css = ''
-  if reactions:
-    reactions_css = REACTION_CSS.format(css=css, reactions=reactions)
+  if msg.reactions:
+    reactions_css = REACTION_CSS.format(css=css, reactions=msg.reactions)
   
   quote_css = ''
-  if quote_date:
-    assert(quote is not None)
-    assert(contact_quoted is not None)
-    quote_date = datetime.fromtimestamp(int(quote_date)//1000)
-    quote_filename_css = ''
-    for p in quote_filename:
-      if p.filename:
-        quote_filename_css += FILENAME.format(filename=ATTACHMENT_DIR+p.filename)
-      else:
-        quote_filename_css = ''
-    quote_css = QUOTE.format(contact_quoted = contact_quoted, quote = quote, quote_date = quote_date, css = css, quote_filename = quote_filename_css, offset = offset)
-
   filename_css = ''
-  if filename:
-    for p in filename:
-      if p.part_quote == 0:
-        filename_css += FILENAME.format(filename=ATTACHMENT_DIR + p.filename)
+  if isinstance(msg, MMS): 
+    if msg.quote_id:
+      quoted_msg = msg_dict.get(msg.quote_id)
+      assert(msg.quote_body is not None)
+      if isinstance(quoted_msg, MMS) and quoted_msg.date in msg_dict.keys():
+        quote_date = datetime.fromtimestamp(int(quoted_msg.date)//1000)
+        quote_filename_css = ''
+        for p in quoted_msg.parts:
+          if p.filename and p.part_quote == 0:
+            quote_filename_css += FILENAME.format(filename=ATTACHMENT_DIR+p.filename)
+          else:
+            quote_filename_css = ''
+        quote_css = QUOTE.format(contact_quoted = contact_quoted, quote = msg.quote_body, quote_date = quoted_msg.date, css = css, quote_filename = quote_filename_css, offset = offset)
 
-  if msg == '' and not filename:
-    return ''
+    if msg.parts:
+      for p in msg.parts:
+        if p.part_quote == 0:
+          filename_css += FILENAME.format(filename=ATTACHMENT_DIR + p.filename)
 
-  if msg == None:
-    msg = ''
+    if msg.body == '' and not msg.parts:
+      return ''
 
-  return TEMPLATE.format(contact_name = contact_name, date = date, quoted_msg = quote_css, msg_sent = msg, filename_sent = filename_css, css = css, offset = offset, reactions=reactions_css)
+  return TEMPLATE.format(contact_name = contact_name, date = msg_date, quoted_msg = quote_css, msg_sent = msg.body, filename_sent = filename_css, css = css, offset = offset, reactions=reactions_css)
+
 
 def save_msg(output_file, msg_dict):
 
