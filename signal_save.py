@@ -11,14 +11,14 @@ from signal_structure import MMS, SMS, PART, SMS_SENT, SMS_RECV, SMS_NULL
 
 def fetch_contact_msg(contact_address, db_cursor, thread_id):
   # MMS
-  db_cursor.execute("select date, msg_box, body, part_count, quote_id, quote_body, reactions, part._id, part.ct, part.unique_id FROM MMS LEFT JOIN part ON part.mid = MMS._id WHERE thread_id={}".format(thread_id))
+  db_cursor.execute("select date, msg_box, body, part_count, quote_id, quote_body, reactions, part._id, part.ct, part.unique_id, part.quote FROM MMS LEFT JOIN part ON part.mid = MMS._id WHERE thread_id={}".format(thread_id))
   msg = OrderedDict()
   for m in db_cursor.fetchall():
     mms = msg.get(m[0])
     if mms:
-      mms.parts.append(PART(m[7],m[8],m[9]))
+      mms.parts.append(PART(m[7],m[8],m[9],m[10]))
     else:
-      msg[m[0]] = MMS(m[0],m[1],m[2],m[3],m[4],m[5],m[6],m[7],m[8],m[9])
+      msg[m[0]] = MMS(m[0],m[1],m[2],m[3],m[4],m[5],m[6],m[7],m[8],m[9],m[10])
 
   db_cursor.execute("select thread_id, address, date_sent, type, body, reactions FROM sms where thread_id=={}".format(thread_id))
   for s in db_cursor.fetchall():
@@ -29,10 +29,10 @@ def fetch_contact_msg(contact_address, db_cursor, thread_id):
   return msg
   
 def fetch_part_used(db_cursor):
-  db_cursor.execute("select part._id, part.ct, part.unique_id FROM PART INNER JOIN mms ON part.mid = mms._id WHERE thread_id={}".format(thread_id))
+  db_cursor.execute("select part._id, part.ct, part.unique_id, part.quote FROM PART INNER JOIN mms ON part.mid = mms._id WHERE thread_id={}".format(thread_id))
   parts = OrderedDict()
   for p in db_cursor.fetchall():
-    parts[p[0]] = PART(p[0],p[1],p[2])
+    parts[p[0]] = PART(p[0],p[1],p[2],p[3])
   return parts
 
 def build_header():
