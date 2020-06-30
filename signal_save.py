@@ -136,6 +136,17 @@ def remove_attachment(db_cursor, thread_id):
     print(file_to_remove)
     #file_to_remove.unlink()
 
+def create_output_dir(output_dir):
+
+  try:
+    pathlib.Path(output_dir).mkdir(parents=True)
+  except FileExistsError:
+    raise FileExistsError("Output directory already exists, delete it or use another one.")
+
+  bootstrap_dir = "/bootstrap/css/"
+  #print(output_dir + bootstrap_dir)
+  pathlib.Path(output_dir + bootstrap_dir).mkdir(parents=True, exist_ok=True)
+
 if __name__ == "__main__":
 
   parser = argparse.ArgumentParser()
@@ -154,6 +165,8 @@ if __name__ == "__main__":
   
   conn = sqlite3.connect(args.db_path)
   db_cursor = conn.cursor()
+
+  create_output_dir(args.html_output_dir)
 
   msg_dict = OrderedDict(sorted(fetch_contact_msg(args.contact_address, db_cursor, args.thread_id).items()))
 
