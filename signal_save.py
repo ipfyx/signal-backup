@@ -97,7 +97,8 @@ def save_msg(output_dir, msg_dict):
         html_result.write(build_footer())
         html_result.close()
 
-      html_result = open(output_dir + '/{}-{}.html'.format(cur_date.month, cur_date.year),'w')
+      cur_date_filename = '{}.html'.format(datetime.strftime(cur_date,"%B-%Y"))
+      html_result = open(output_dir + '/' + cur_date_filename, 'a')
       html_result.write(build_header())
 
     if msgi.msg_type == SMS_RECV:
