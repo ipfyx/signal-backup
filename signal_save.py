@@ -145,7 +145,7 @@ if __name__ == "__main__":
   parser.add_argument("--contact_addr", "-ca", dest="contact_address", help="Contact address, multiple conversion saving are not yet supported", type=int)
   parser.add_argument("--contact_name", "-cn", dest="contact_name", help="Name of the contact you wish to display", type=str)
   parser.add_argument("--you", "-m", dest="your_name", help="Your name", type=str)
-  parser.add_argument("--out", "-o", dest="html_output_file", help="html output file", type=str)
+  parser.add_argument("--output_dir", "-o", dest="html_output_dir", help="html output dir", type=str)
   args = parser.parse_args()
 
   CONTACT_NAME = args.contact_name
@@ -157,5 +157,5 @@ if __name__ == "__main__":
 
   msg_dict = OrderedDict(sorted(fetch_contact_msg(args.contact_address, db_cursor, args.thread_id).items()))
 
-  save_msg(args.html_output_file, msg_dict)
+  save_msg(args.html_output_dir, msg_dict)
   remove_attachment(db_cursor, args.thread_id)
