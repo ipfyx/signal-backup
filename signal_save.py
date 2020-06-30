@@ -38,6 +38,9 @@ def fetch_part_used(db_cursor):
 def build_header():
   return HEAD + NAVBAR
 
+def build_footer():
+  return  FOOTER
+
 def build_msg(contact_name, date, msg, filename=None, part_count=None, contact_quoted=None, quote=None, quote_date=None, quote_filename=None, reactions=None):
   if contact_name == CONTACT_NAME:
     offset = "offset-md-5"
