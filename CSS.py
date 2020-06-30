@@ -113,3 +113,14 @@ QUOTE = """
           </div>
         </div>
 """
+
+INDEX = """
+      <section class="row">
+        <div class="col-md-6 msg_mycontact">
+          <p>
+            <a href="{link}">{link}</a>
+          </p>
+      </section>
+  """
+
+
