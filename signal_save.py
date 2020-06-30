@@ -3,6 +3,7 @@
 
 import sqlite3
 import argparse
+import pathlib
 from pdb import pm,set_trace
 from datetime import datetime
 from collections import OrderedDict
@@ -28,11 +29,11 @@ def fetch_contact_msg(contact_address, db_cursor, thread_id):
 
   return msg
   
-def fetch_part_used(db_cursor):
-  db_cursor.execute("select part._id, part.ct, part.unique_id, part.quote FROM PART INNER JOIN mms ON part.mid = mms._id WHERE thread_id={}".format(thread_id))
-  parts = OrderedDict()
+def fetch_part_not_used(db_cursor, thread_id):
+  db_cursor.execute("select part._id, part.ct, part.unique_id, part.quote FROM PART INNER JOIN mms ON part.mid = mms._id WHERE thread_id!={}".format(thread_id))
+  parts = []
   for p in db_cursor.fetchall():
-    parts[p[0]] = PART(p[0],p[1],p[2],p[3])
+    parts.append(PART(p[0],p[1],p[2],p[3]))
   return parts
 
 def build_header():
@@ -127,6 +128,13 @@ def generate_index(output_dir, files):
   html_result.write(build_footer())
   html_result.close()
 
+def remove_attachment(db_cursor, thread_id):
+
+  unused = fetch_part_not_used(db_cursor, thread_id)
+  for part in unused:
+    file_to_remove = pathlib.Path(ATTACHMENT_DIR + part.filename)
+    print(file_to_remove)
+    #file_to_remove.unlink()
 
 if __name__ == "__main__":
 
@@ -150,3 +158,4 @@ if __name__ == "__main__":
   msg_dict = OrderedDict(sorted(fetch_contact_msg(args.contact_address, db_cursor, args.thread_id).items()))
 
   save_msg(args.html_output_file, msg_dict)
+  remove_attachment(db_cursor, args.thread_id)
