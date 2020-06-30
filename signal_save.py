@@ -14,7 +14,11 @@ def fetch_contact_msg(contact_address, db_cursor, thread_id):
   db_cursor.execute("select date, msg_box, body, part_count, quote_id, quote_body, reactions, part._id, part.ct, part.unique_id FROM MMS LEFT JOIN part ON part.mid = MMS._id WHERE thread_id={}".format(thread_id))
   msg = OrderedDict()
   for m in db_cursor.fetchall():
-    msg[m[0]] = MMS(m[0],m[1],m[2],m[3],m[4],m[5],m[6],m[7],m[8],m[9])
+    mms = msg.get(m[0])
+    if mms:
+      mms.parts.append(PART(m[7],m[8],m[9]))
+    else:
+      msg[m[0]] = MMS(m[0],m[1],m[2],m[3],m[4],m[5],m[6],m[7],m[8],m[9])
 
   db_cursor.execute("select thread_id, address, date_sent, type, body, reactions FROM sms where thread_id=={}".format(thread_id))
   for s in db_cursor.fetchall():
@@ -54,18 +58,23 @@ def build_msg(contact_name, date, msg, filename=None, part_count=None, contact_q
     assert(quote is not None)
     assert(contact_quoted is not None)
     quote_date = datetime.fromtimestamp(int(quote_date)//1000)
-    if quote_filename:
-      quote_filename_css = FILENAME.format(filename=ATTACHMENT_DIR+quote_filename)
-    else:
-      quote_filename_css = ''
+    quote_filename_css = ''
+    for p in quote_filename:
+      if p.filename:
+        quote_filename_css += FILENAME.format(filename=ATTACHMENT_DIR+p.filename)
+      else:
+        quote_filename_css = ''
     quote_css = QUOTE.format(contact_quoted = contact_quoted, quote = quote, quote_date = quote_date, css = css, quote_filename = quote_filename_css, offset = offset)
+
   else:
     quote_css = ''
 
   if filename and part_count > 0:
-    filename_css = FILENAME.format(filename=ATTACHMENT_DIR+filename)
+    filename_css = ''
+    for p in filename:
+      filename_css += FILENAME.format(filename=ATTACHMENT_DIR + p.filename)
   elif filename and msg == '':
-    filename_css = FILENAME.format(filename=ATTACHMENT_DIR+filename)
+    filename_css = FILENAME.format(filename=ATTACHMENT_DIR+filename[0].filename)
   else:
     filename_css = ''
 
@@ -111,9 +120,9 @@ def save_msg(output_file, msg_dict):
       elif isinstance(msgi, MMS):
         quoted_msg = msg_dict.get(msgi.quote_id)
         if isinstance(quoted_msg, MMS) and quoted_msg.date in msg_dict.keys():
-          html_result.write(build_msg(CONTACT_NAME, msg_date, msgi.body, part_count=msgi.part_count, filename=msgi.part.filename, contact_quoted=MYSELF, quote_filename=quoted_msg.part.filename, quote= msgi.quote_body, quote_date=quoted_msg.date, reactions=msgi.reactions))
+          html_result.write(build_msg(CONTACT_NAME, msg_date, msgi.body, part_count=msgi.part_count, filename=msgi.parts, contact_quoted=MYSELF, quote_filename=quoted_msg.parts, quote= msgi.quote_body, quote_date=quoted_msg.date, reactions=msgi.reactions))
         else:
-          html_result.write(build_msg(CONTACT_NAME, msg_date, msgi.body, part_count=msgi.part_count, filename=msgi.part.filename, reactions=msgi.reactions))
+          html_result.write(build_msg(CONTACT_NAME, msg_date, msgi.body, part_count=msgi.part_count, filename=msgi.parts, reactions=msgi.reactions))
 
     elif msgi.msg_type == SMS_SENT:
       if isinstance(msgi, SMS):
@@ -121,9 +130,9 @@ def save_msg(output_file, msg_dict):
       elif isinstance(msgi, MMS):
         quoted_msg = msg_dict.get(msgi.quote_id)
         if isinstance(quoted_msg, MMS) and quoted_msg.date in msg_dict.keys():
-          html_result.write(build_msg(MYSELF, msg_date, msgi.body, part_count=msgi.part_count, filename=msgi.part.filename, contact_quoted=CONTACT_NAME, quote_filename=quoted_msg.part.filename, quote=msgi.quote_body, quote_date=quoted_msg.date, reactions=msgi.reactions))
+          html_result.write(build_msg(MYSELF, msg_date, msgi.body, part_count=msgi.part_count, filename=msgi.parts, contact_quoted=CONTACT_NAME, quote_filename=quoted_msg.parts, quote=msgi.quote_body, quote_date=quoted_msg.date, reactions=msgi.reactions))
         else:
-          html_result.write(build_msg(MYSELF, msg_date, msgi.body, part_count=msgi.part_count, filename=msgi.part.filename, reactions=msgi.reactions))
+          html_result.write(build_msg(MYSELF, msg_date, msgi.body, part_count=msgi.part_count, filename=msgi.parts, reactions=msgi.reactions))
 
     elif msgi.msg_type in SMS_NULL:
         pass
