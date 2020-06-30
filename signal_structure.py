@@ -22,7 +22,10 @@ class MMS(object):
     else:
       self.reactions = reactions
 
-    self.part = PART(mms_id, part_ct, part_unique_id)
+    if part_unique_id:
+      self.part = [PART(mms_id, part_ct, part_unique_id)]
+    else:
+      self.part = []
 
   def __str__(self):
     return self.__repr__()
