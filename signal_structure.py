@@ -8,7 +8,7 @@ SMS_NULL = [10747924,10747927,2,1,3]
 
 @total_ordering
 class MMS(object):
-  def __init__(self, date, msg_type, body, part_count, quote_id, quote_body, reactions, mms_id, part_ct, part_unique_id):
+  def __init__(self, date, msg_type, body, part_count, quote_id, quote_body, reactions, mms_id, part_ct, part_unique_id, part_quote):
     self.date = date
     self.msg_type = msg_type
     self.body = body
@@ -23,7 +23,7 @@ class MMS(object):
       self.reactions = reactions
 
     if part_unique_id:
-      self.parts = [PART(mms_id, part_ct, part_unique_id)]
+      self.parts = [PART(mms_id, part_ct, part_unique_id, part_quote)]
     else:
       self.parts = []
 
@@ -73,10 +73,14 @@ class SMS(object):
     return "date : {}, type : {}, body : {}, thread_id : {}, address : {}, reactions : {}\n".format(self.date, self.msg_type, self.body, self.thread_id, self.address, self.reactions)
 
 class PART(object):
-  def __init__(self, id_part, ct, unique_id):
+  def __init__(self, id_part, ct, unique_id, part_quote):
     self.id_part = id_part 
     self.ct = ct 
     self.unique_id = unique_id
+
+    # 1 if the part is already included in the quote
+    # else 0
+    self.part_quote = part_quote
 
     if unique_id is not None:
       assert(id_part is not None)
