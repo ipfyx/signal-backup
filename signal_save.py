@@ -106,9 +106,9 @@ def save_msg(output_dir, msg_dict):
       html_result.write(build_header())
 
     if msgi.msg_type == SMS_RECV:
-      html_result.write(build_msg(CONTACT_NAME, MYSELF, msgi))
-    elif msgi.msg_type == SMS_SENT:
       html_result.write(build_msg(MYSELF, CONTACT_NAME, msgi))
+    elif msgi.msg_type == SMS_SENT:
+      html_result.write(build_msg(CONTACT_NAME, MYSELF, msgi))
     elif msgi.msg_type in SMS_NULL:
         pass
     else:
