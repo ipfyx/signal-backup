@@ -77,6 +77,9 @@ def build_msg(contact_name, date, msg, filename=None, part_count=None, contact_q
   if msg == '' and not filename:
     return ''
 
+  if msg == None:
+    msg = ''
+
   return TEMPLATE.format(contact_name = contact_name, date = date, quoted_msg = quote_css, msg_sent = msg, filename_sent = filename_css, css = css, offset = offset, reactions=reactions_css)
 
 def save_msg(output_file, msg_dict):
