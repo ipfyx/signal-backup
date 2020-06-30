@@ -30,10 +30,10 @@ def fetch_contact_msg(contact_address, db_cursor, thread_id):
   
 def fetch_part_used(db_cursor):
   db_cursor.execute("select part._id, part.ct, part.unique_id FROM PART INNER JOIN mms ON part.mid = mms._id WHERE thread_id={}".format(thread_id))
-  part = OrderedDict()
+  parts = OrderedDict()
   for p in db_cursor.fetchall():
-    part[p[0]] = PART(p[0],p[1],p[2])
-  return part
+    parts[p[0]] = PART(p[0],p[1],p[2])
+  return parts
 
 def build_header():
   return HEAD + NAVBAR
@@ -48,9 +48,8 @@ def build_msg(contact_name, date, msg, filename=None, part_count=None, contact_q
   else:
     raise ValueError
 
-
   if reactions:
-    reactions_css = REACTION_CSS.format(css=css,reactions=reactions)
+    reactions_css = REACTION_CSS.format(css=css, reactions=reactions)
   else:
     reactions_css = ''
   
