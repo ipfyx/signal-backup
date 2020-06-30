@@ -166,9 +166,11 @@ REACTION_CSS = """
 
 # Msg filename
 FILENAME ="""
+          <p>
           <a href="{filename}">
             <img src="{filename}">
           </a>
+          </p>
 """
 
 QUOTE = """
