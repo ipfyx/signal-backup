@@ -23,9 +23,9 @@ class MMS(object):
       self.reactions = reactions
 
     if part_unique_id:
-      self.part = [PART(mms_id, part_ct, part_unique_id)]
+      self.parts = [PART(mms_id, part_ct, part_unique_id)]
     else:
-      self.part = []
+      self.parts = []
 
   def __str__(self):
     return self.__repr__()
@@ -40,7 +40,7 @@ class MMS(object):
     return (self.date < other.date)
   
   def __repr__(self):
-    return "date : {}, type : {}, body : {}, part_count : {}, quote_id : {}, quote_body : {}, reactions : {}, part : {}\n".format(self.date, self.msg_type, self.body, self.part_count, self.quote_id, self.quote_body, self.reactions, self.part)
+    return "date : {}, type : {}, body : {}, part_count : {}, quote_id : {}, quote_body : {}, reactions : {}, parts : {}\n".format(self.date, self.msg_type, self.body, self.part_count, self.quote_id, self.quote_body, self.reactions, self.parts)
 
 @total_ordering
 class SMS(object):
