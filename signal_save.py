@@ -76,29 +76,6 @@ def build_msg(contact_name, date, msg, filename=None, part_count=None, contact_q
 
   return TEMPLATE.format(contact_name = contact_name, date = date, quoted_msg = quote_css, msg_sent = msg, filename_sent = filename_css, css = css, offset = offset, reactions=reactions_css)
 
-
-def build_footer():
-  return  FOOTER
-
-def test_css():
-  html_result = open('test.html','w')
-  html_result.write(build_header())
-  
-  html_result.write(build_msg(CONTACT_NAME, '1583604356792', "test toto", reaction="toto"))
-  html_result.write(build_msg(MYSELF, '1583604356792', "test toto", reaction="tata"))
-  
-  html_result.write(build_msg(CONTACT_NAME, '1583604356792', "test toto", filename='flower.jpg'))
-  html_result.write(build_msg(MYSELF, '1583604356792', "test toto", filename='flower.jpg'))
-  
-  html_result.write(build_msg(CONTACT_NAME, '1583604356792', "test toto", contact_quoted=MYSELF, quote="test toto", quote_date='1583604356792'))
-  html_result.write(build_msg(MYSELF, '1583604356792', "test toto", contact_quoted=CONTACT_NAME, quote="test toto", quote_date='1583604356792'))
-  
-  html_result.write(build_msg(CONTACT_NAME, '1583604356792', "test toto", contact_quoted=MYSELF, filename='flower.jpg', quote="test toto" ,quote_date='1583604356792'))
-  html_result.write(build_msg(MYSELF, '1583604356792', "test toto", contact_quoted=CONTACT_NAME, quote="test toto", filename='flower.jpg', quote_date='1583604356792'))
-  
-  html_result.write(build_footer())
-  html_result.close()
-
 def save_msg(output_file, msg_dict):
 
   html_result = open(output_file,'w')
@@ -157,7 +134,3 @@ if __name__ == "__main__":
   msg_dict = OrderedDict(sorted(fetch_contact_msg(args.contact_address, db_cursor, args.thread_id).items()))
 
   save_msg(args.html_output_file, msg_dict)
-  test_css()
-
-
-
