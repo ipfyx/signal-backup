@@ -11,7 +11,10 @@ class MMS(object):
   def __init__(self, date, msg_type, body, part_count, quote_id, quote_body, reactions, mms_id, part_ct, part_unique_id, part_quote):
     self.date = date
     self.msg_type = msg_type
-    self.body = body
+    if body:
+      self.body = body
+    else:
+      self.body = ''
     self.part_count = part_count
     self.quote_id = quote_id
     self.quote_body = quote_body

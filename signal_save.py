@@ -93,9 +93,9 @@ def save_msg(output_file, msg_dict):
     msg_date = datetime.fromtimestamp(msg_key//1000)
 
     if msgi.msg_type == SMS_RECV:
-      html_result.write(build_msg2(CONTACT_NAME, MYSELF, msgi))
+      html_result.write(build_msg(CONTACT_NAME, MYSELF, msgi))
     elif msgi.msg_type == SMS_SENT:
-      html_result.write(build_msg2(MYSELF, CONTACT_NAME, msgi))
+      html_result.write(build_msg(MYSELF, CONTACT_NAME, msgi))
     elif msgi.msg_type in SMS_NULL:
         pass
     else:
