@@ -93,25 +93,9 @@ def save_msg(output_file, msg_dict):
     msg_date = datetime.fromtimestamp(msg_key//1000)
 
     if msgi.msg_type == SMS_RECV:
-      if isinstance(msgi, SMS):
-        html_result.write(build_msg(CONTACT_NAME, msg_date, msgi.body, reactions=msgi.reactions))
-      elif isinstance(msgi, MMS):
-        quoted_msg = msg_dict.get(msgi.quote_id)
-        if isinstance(quoted_msg, MMS) and quoted_msg.date in msg_dict.keys():
-          html_result.write(build_msg(CONTACT_NAME, msg_date, msgi.body, part_count=msgi.part_count, filename=msgi.parts, contact_quoted=MYSELF, quote_filename=quoted_msg.parts, quote= msgi.quote_body, quote_date=quoted_msg.date, reactions=msgi.reactions))
-        else:
-          html_result.write(build_msg(CONTACT_NAME, msg_date, msgi.body, part_count=msgi.part_count, filename=msgi.parts, reactions=msgi.reactions))
-
+      html_result.write(build_msg2(CONTACT_NAME, MYSELF, msgi))
     elif msgi.msg_type == SMS_SENT:
-      if isinstance(msgi, SMS):
-        html_result.write(build_msg(MYSELF, msg_date, msgi.body, reactions=msgi.reactions))
-      elif isinstance(msgi, MMS):
-        quoted_msg = msg_dict.get(msgi.quote_id)
-        if isinstance(quoted_msg, MMS) and quoted_msg.date in msg_dict.keys():
-          html_result.write(build_msg(MYSELF, msg_date, msgi.body, part_count=msgi.part_count, filename=msgi.parts, contact_quoted=CONTACT_NAME, quote_filename=quoted_msg.parts, quote=msgi.quote_body, quote_date=quoted_msg.date, reactions=msgi.reactions))
-        else:
-          html_result.write(build_msg(MYSELF, msg_date, msgi.body, part_count=msgi.part_count, filename=msgi.parts, reactions=msgi.reactions))
-
+      html_result.write(build_msg2(MYSELF, CONTACT_NAME, msgi))
     elif msgi.msg_type in SMS_NULL:
         pass
     else:
