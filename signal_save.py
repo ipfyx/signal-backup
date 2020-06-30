@@ -48,11 +48,11 @@ def build_msg(contact_name, date, msg, filename=None, part_count=None, contact_q
   else:
     raise ValueError
 
+  reactions_css = ''
   if reactions:
     reactions_css = REACTION_CSS.format(css=css, reactions=reactions)
-  else:
-    reactions_css = ''
   
+  quote_css = ''
   if quote_date:
     assert(quote is not None)
     assert(contact_quoted is not None)
@@ -65,17 +65,11 @@ def build_msg(contact_name, date, msg, filename=None, part_count=None, contact_q
         quote_filename_css = ''
     quote_css = QUOTE.format(contact_quoted = contact_quoted, quote = quote, quote_date = quote_date, css = css, quote_filename = quote_filename_css, offset = offset)
 
-  else:
-    quote_css = ''
-
-  if filename and part_count > 0:
-    filename_css = ''
+  filename_css = ''
+  if filename:
     for p in filename:
-      filename_css += FILENAME.format(filename=ATTACHMENT_DIR + p.filename)
-  elif filename and msg == '':
-    filename_css = FILENAME.format(filename=ATTACHMENT_DIR+filename[0].filename)
-  else:
-    filename_css = ''
+      if p.part_quote == 0:
+        filename_css += FILENAME.format(filename=ATTACHMENT_DIR + p.filename)
 
   if msg == '' and not filename:
     return ''
