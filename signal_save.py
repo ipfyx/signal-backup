@@ -69,8 +69,6 @@ def build_msg(contact_name, contact_quoted, msg):
         for p in quoted_msg.parts:
           if p.filename and p.part_quote == 0:
             quote_filename_css += FILENAME.format(filename=ATTACHMENT_DIR+p.filename)
-          else:
-            quote_filename_css = ''
         quote_css = QUOTE.format(contact_quoted = contact_quoted, quote = msg.quote_body, quote_date = quoted_msg.date, css = css, quote_filename = quote_filename_css, offset = offset)
 
     if msg.parts:
