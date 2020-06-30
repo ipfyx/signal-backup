@@ -87,6 +87,8 @@ def save_msg(output_dir, msg_dict):
   html_result = None
   cur_date = datetime.fromtimestamp(0)
 
+  files = []
+
   for msg_key, msgi in msg_dict.items():
     msg_date = datetime.fromtimestamp(msg_key//1000)
 
@@ -98,6 +100,7 @@ def save_msg(output_dir, msg_dict):
         html_result.close()
 
       cur_date_filename = '{}.html'.format(datetime.strftime(cur_date,"%B-%Y"))
+      files.append(cur_date_filename)
       html_result = open(output_dir + '/' + cur_date_filename, 'a')
       html_result.write(build_header())
 
@@ -108,10 +111,22 @@ def save_msg(output_dir, msg_dict):
     elif msgi.msg_type in SMS_NULL:
         pass
     else:
-        raise ValueError(msgi.msg_type)
+        print(msgi)
   
   html_result.write(build_footer())
   html_result.close()
+  generate_index(output_dir, files)
+
+def generate_index(output_dir, files):
+  html_result = open(output_dir + '/index.html', 'w')
+  html_result.write(build_header())
+
+  for link in files:
+    html_result.write(INDEX.format(link=link))
+
+  html_result.write(build_footer())
+  html_result.close()
+
 
 if __name__ == "__main__":
 
