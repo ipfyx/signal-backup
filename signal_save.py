@@ -84,13 +84,23 @@ def build_msg(contact_name, contact_quoted, msg):
   return TEMPLATE.format(contact_name = contact_name, date = msg_date, quoted_msg = quote_css, msg_sent = msg.body, filename_sent = filename_css, css = css, offset = offset, reactions=reactions_css)
 
 
-def save_msg(output_file, msg_dict):
+def save_msg(output_dir, msg_dict):
 
-  html_result = open(output_file,'w')
-  html_result.write(build_header())
+  html_result = None
+  cur_date = datetime.fromtimestamp(0)
 
   for msg_key, msgi in msg_dict.items():
     msg_date = datetime.fromtimestamp(msg_key//1000)
+
+    if msg_date.month > cur_date.month or msg_date.year > cur_date.year:
+      cur_date = msg_date
+
+      if html_result:
+        html_result.write(build_footer())
+        html_result.close()
+
+      html_result = open(output_dir + '/{}-{}.html'.format(cur_date.month, cur_date.year),'w')
+      html_result.write(build_header())
 
     if msgi.msg_type == SMS_RECV:
       html_result.write(build_msg(CONTACT_NAME, MYSELF, msgi))
