@@ -3,7 +3,8 @@
 
 import sqlite3
 import argparse
-import pathlib, shutil
+from shutil import copy
+from pathlib import Path
 from pdb import pm,set_trace
 from datetime import datetime
 from collections import OrderedDict
@@ -132,26 +133,26 @@ def remove_attachment(db_cursor, thread_id):
 
   unused = fetch_part_not_used(db_cursor, thread_id)
   for part in unused:
-    file_to_remove = pathlib.Path(ATTACHMENT_DIR + part.filename)
+    file_to_remove = Path(ATTACHMENT_DIR + part.filename)
     print(file_to_remove)
     #file_to_remove.unlink()
 
 def create_output_dir(output_dir):
-
-  try:
-    pathlib.Path(output_dir).mkdir(parents=True)
-  except FileExistsError:
-    raise FileExistsError("Output directory already exists, delete it or use another one.")
-
   output_dir += "/"
   bootstrap_dir = "bootstrap/css/"
   bootstrap_css = "bootstrap.css"
   signal_css = "signal.css"
 
-  pathlib.Path(output_dir + bootstrap_dir).mkdir(parents=True, exist_ok=True)
-  shutil.copy(bootstrap_dir + bootstrap_css, output_dir + bootstrap_dir)
-  shutil.copy(signal_css, output_dir + bootstrap_dir)
-  
+  try:
+    Path(output_dir).mkdir(parents=True)
+  except FileExistsError:
+    raise FileExistsError("Output directory already exists, delete it or use another one.")
+
+  Path(output_dir + 'attachment').symlink_to(Path(ATTACHMENT_DIR), target_is_directory=True)
+
+  Path(output_dir + bootstrap_dir).mkdir(parents=True, exist_ok=True)
+  copy(bootstrap_dir + bootstrap_css, output_dir + bootstrap_dir)
+  copy(signal_css, output_dir + bootstrap_dir)
 
 if __name__ == "__main__":
 
