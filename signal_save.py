@@ -186,7 +186,6 @@ if __name__ == "__main__":
   parser.add_argument("--output_dir", "-o", dest="html_output_dir", help="html output dir", type=str)
   args = parser.parse_args()
 
-  CONTACT_NAME = args.contact_name
   ATTACHMENT_DIR = args.attachment_dir+'/'
 
   conn = sqlite3.connect(args.db_path)
