@@ -98,7 +98,7 @@ class PART(object):
     return self.__repr__()
 
 class CONTACT(object):
-  def __init__(self, _id, phone, color, thread_id):
+  def __init__(self, _id, phone, color, name, thread_id):
     self.id = _id
     self.name = name
     self.phone = phone
