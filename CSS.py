@@ -3,8 +3,8 @@ HEAD = """
   <html>
     <head>
       <meta charset='utf-8'>
-      <link href="bootstrap-4.4.1-dist/css/bootstrap.css" rel="stylesheet">
-      <link href="signal.css" rel="stylesheet">
+      <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
+      <link href="bootstrap/css/signal.css" rel="stylesheet">
     </head>
     <body>
   """
@@ -13,7 +13,7 @@ NAVBAR = """
     <div class="container">
   
       <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <a class="navbar-brand" href="#">Navbar</a>
+      <a class="navbar-brand" href="index.html">INDEX</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -116,7 +116,7 @@ QUOTE = """
 
 INDEX = """
       <section class="row">
-        <div class="col-md-6 msg_mycontact">
+        <div class="col-md-6 msg_myself">
           <p>
             <a href="{link}">{link}</a>
           </p>
