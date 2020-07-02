@@ -3,7 +3,7 @@
 
 import sqlite3
 import argparse
-import pathlib
+import pathlib, shutil
 from pdb import pm,set_trace
 from datetime import datetime
 from collections import OrderedDict
@@ -143,9 +143,15 @@ def create_output_dir(output_dir):
   except FileExistsError:
     raise FileExistsError("Output directory already exists, delete it or use another one.")
 
-  bootstrap_dir = "/bootstrap/css/"
-  #print(output_dir + bootstrap_dir)
+  output_dir += "/"
+  bootstrap_dir = "bootstrap/css/"
+  bootstrap_css = "bootstrap.css"
+  signal_css = "signal.css"
+
   pathlib.Path(output_dir + bootstrap_dir).mkdir(parents=True, exist_ok=True)
+  shutil.copy(bootstrap_dir + bootstrap_css, output_dir + bootstrap_dir)
+  shutil.copy(signal_css, output_dir + bootstrap_dir)
+  
 
 if __name__ == "__main__":
 
