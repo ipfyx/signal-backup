@@ -11,7 +11,7 @@ from collections import OrderedDict
 from CSS import *
 from signal_structure import MMS, SMS, PART, SMS_SENT, SMS_RECV, SMS_NULL
 
-def fetch_contact_msg(contact_address, db_cursor, thread_id):
+def fetch_contact_msg(db_cursor, thread_id):
   # MMS
   db_cursor.execute("select date, msg_box, body, part_count, quote_id, quote_body, reactions, part._id, part.ct, part.unique_id, part.quote FROM MMS LEFT JOIN part ON part.mid = MMS._id WHERE thread_id={}".format(thread_id))
   msg = OrderedDict()
@@ -160,7 +160,6 @@ if __name__ == "__main__":
   parser.add_argument("--db", dest="db_path", help="Path to signal_backup.db file", type=str)
   parser.add_argument("--attachment", "-a", dest="attachment_dir", help="Path to attachment directory", type=str)
   parser.add_argument("--thread", "-t", dest="thread_id", help="Conversation ID, multiple conversion saving are not yet supported", type=int)
-  parser.add_argument("--contact_addr", "-ca", dest="contact_address", help="Contact address, multiple conversion saving are not yet supported", type=int)
   parser.add_argument("--contact_name", "-cn", dest="contact_name", help="Name of the contact you wish to display", type=str)
   parser.add_argument("--you", "-m", dest="your_name", help="Your name", type=str)
   parser.add_argument("--output_dir", "-o", dest="html_output_dir", help="html output dir", type=str)
@@ -175,7 +174,7 @@ if __name__ == "__main__":
 
   create_output_dir(args.html_output_dir)
 
-  msg_dict = OrderedDict(sorted(fetch_contact_msg(args.contact_address, db_cursor, args.thread_id).items()))
+  msg_dict = OrderedDict(sorted(fetch_contact_msg(db_cursor, args.thread_id).items()))
 
   save_msg(args.html_output_dir, msg_dict)
   remove_attachment(db_cursor, args.thread_id)
