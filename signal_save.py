@@ -37,6 +37,20 @@ def fetch_part_not_used(db_cursor, thread_id):
     parts.append(PART(p[0],p[1],p[2],p[3]))
   return parts
 
+def fetch_contact(db_cursor, contact_name=None, _id=None):
+  if _id:
+    db_cursor.execute("SELECT recipient._id, recipient.phone, recipient.color, recipient.signal_profile_name, thread._id FROM recipient INNER JOIN thread ON recipient._id = thread.recipient_ids WHERE recipient._id={}".format(_id))
+  elif contact_name:
+    db_cursor.execute("SELECT recipient._id, recipient.phone, recipient.color, recipient.signal_profile_name, thread._id FROM recipient INNER JOIN thread ON recipient._id = thread.recipient_ids WHERE recipient.contact_name={}".format(contact_name))
+  else:
+    raise ValueError('Please specify a name on an id')
+
+  contact = db_cursor.fetchall()
+  if contact:
+    return CONTACT(contact[0], contact[1], contact[2], contact[3], contact[4])
+  else:
+    raise ValueError(contact_name + 'was not found in db')
+
 def build_header():
   return HEAD + NAVBAR
 
