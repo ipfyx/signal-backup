@@ -41,11 +41,11 @@ def fetch_contact(db_cursor, contact_name=None, _id=None):
   if _id:
     db_cursor.execute("SELECT recipient._id, recipient.phone, recipient.color, recipient.signal_profile_name, thread._id FROM recipient INNER JOIN thread ON recipient._id = thread.recipient_ids WHERE recipient._id={}".format(_id))
   elif contact_name:
-    db_cursor.execute("SELECT recipient._id, recipient.phone, recipient.color, recipient.signal_profile_name, thread._id FROM recipient INNER JOIN thread ON recipient._id = thread.recipient_ids WHERE recipient.contact_name={}".format(contact_name))
+    db_cursor.execute("SELECT recipient._id, recipient.phone, recipient.color, recipient.signal_profile_name, thread._id FROM recipient INNER JOIN thread ON recipient._id = thread.recipient_ids WHERE recipient.signal_profile_name='{}'".format(contact_name))
   else:
     raise ValueError('Please specify a name on an id')
 
-  contact = db_cursor.fetchall()
+  contact = db_cursor.fetchone()
   if contact:
     return CONTACT(contact[0], contact[1], contact[2], contact[3], contact[4])
   else:
@@ -57,7 +57,7 @@ def build_header():
 def build_footer():
   return  FOOTER
 
-def build_msg(sender, reciever, msg):
+def build_msg(sender, reciever, msg, msg_dict):
   if sender == MYSELF:
     offset = "offset-md-5"
     css = "myself"
@@ -98,7 +98,11 @@ def build_msg(sender, reciever, msg):
   return TEMPLATE.format(contact_name = sender, date = msg_date, quoted_msg = quote_css, msg_sent = msg.body, filename_sent = filename_css, css = css, offset = offset, reactions=reactions_css)
 
 
-def save_msg(output_dir, msg_dict):
+def save_msg(output_dir, db_cursor, contact_name):
+
+  contact = fetch_contact(db_cursor, contact_name = contact_name)
+
+  msg_dict = OrderedDict(sorted(fetch_contact_msg(db_cursor, contact.thread_id).items()))
 
   html_result = None
   cur_date = datetime.fromtimestamp(0)
@@ -121,9 +125,9 @@ def save_msg(output_dir, msg_dict):
       html_result.write(build_header())
 
     if msgi.msg_type == SMS_RECV:
-      html_result.write(build_msg(sender = CONTACT_NAME, reciever = MYSELF, msg = msgi))
+      html_result.write(build_msg(sender = CONTACT_NAME, reciever = MYSELF, msg = msgi, msg_dict = msg_dict))
     elif msgi.msg_type == SMS_SENT:
-      html_result.write(build_msg(sender = MYSELF, reciever = CONTACT_NAME, msg = msgi))
+      html_result.write(build_msg(sender = MYSELF, reciever = CONTACT_NAME, msg = msgi, msg_dict = msg_dict))
     elif msgi.msg_type in SMS_NULL:
         pass
     else:
@@ -173,7 +177,6 @@ if __name__ == "__main__":
   parser = argparse.ArgumentParser()
   parser.add_argument("--db", dest="db_path", help="Path to signal_backup.db file", type=str)
   parser.add_argument("--attachment", "-a", dest="attachment_dir", help="Path to attachment directory", type=str)
-  parser.add_argument("--thread", "-t", dest="thread_id", help="Conversation ID, multiple conversion saving are not yet supported", type=int)
   parser.add_argument("--contact_name", "-cn", dest="contact_name", help="Name of the contact you wish to display", type=str)
   parser.add_argument("--you", "-m", dest="your_name", help="Your name", type=str)
   parser.add_argument("--output_dir", "-o", dest="html_output_dir", help="html output dir", type=str)
@@ -188,7 +191,5 @@ if __name__ == "__main__":
 
   create_output_dir(args.html_output_dir)
 
-  msg_dict = OrderedDict(sorted(fetch_contact_msg(db_cursor, args.thread_id).items()))
-
-  save_msg(args.html_output_dir, msg_dict)
-  remove_attachment(db_cursor, args.thread_id)
+  save_msg(args.html_output_dir, db_cursor, args.contact_name)
+  #remove_attachment(db_cursor, args.thread_id)
