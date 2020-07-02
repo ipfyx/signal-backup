@@ -98,14 +98,15 @@ class PART(object):
     return self.__repr__()
 
 class CONTACT(object):
-  def __init__(self, _id, phone, color, name):
+  def __init__(self, _id, phone, color, thread_id):
     self.id = _id
     self.name = name
     self.phone = phone
     self.color = color
+    self.thread_id = thread_id 
 
   def __str__(self):
     return self.__repr__()
 
   def __repr__(self):
-    return "id : {}, name : {}, color : {}, phone : {}".format(self.id, self.name, self.color, self.phone)
+    return "id : {}, name : {}, color : {}, phone : {}, thread_id : {}".format(self.id, self.name, self.color, self.phone, self.thread_id)
