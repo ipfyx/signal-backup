@@ -8,14 +8,13 @@ SMS_NULL = [10747924,10747927,2,1,3]
 
 @total_ordering
 class MMS(object):
-  def __init__(self, date, msg_type, body, part_count, quote_id, quote_body, reactions, mms_id, part_ct, part_unique_id, part_quote):
+  def __init__(self, date, msg_type, body, quote_id, quote_body, reactions, mms_id, part_ct, part_unique_id, part_quote):
     self.date = date
     self.msg_type = msg_type
     if body:
       self.body = body
     else:
       self.body = ''
-    self.part_count = part_count
     self.quote_id = quote_id
     self.quote_body = quote_body
     if reactions:
@@ -43,7 +42,7 @@ class MMS(object):
     return (self.date < other.date)
   
   def __repr__(self):
-    return "date : {}, type : {}, body : {}, part_count : {}, quote_id : {}, quote_body : {}, reactions : {}, parts : {}\n".format(self.date, self.msg_type, self.body, self.part_count, self.quote_id, self.quote_body, self.reactions, self.parts)
+    return "date : {}, type : {}, body : {}, quote_id : {}, quote_body : {}, reactions : {}, parts : {}\n".format(self.date, self.msg_type, self.body, self.quote_id, self.quote_body, self.reactions, self.parts)
 
 @total_ordering
 class SMS(object):
