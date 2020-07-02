@@ -80,7 +80,7 @@ def build_msg(contact_name, contact_quoted, msg):
     if msg.body == '' and not msg.parts:
       return ''
 
-  return TEMPLATE.format(contact_name = contact_name, date = msg_date, quoted_msg = quote_css, msg_sent = msg.body, filename_sent = filename_css, css = css, offset = offset, reactions=reactions_css)
+  return TEMPLATE.format(contact_name = contact_quoted, date = msg_date, quoted_msg = quote_css, msg_sent = msg.body, filename_sent = filename_css, css = css, offset = offset, reactions=reactions_css)
 
 
 def save_msg(output_dir, msg_dict):
