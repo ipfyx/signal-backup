@@ -42,13 +42,13 @@ def build_header():
 def build_footer():
   return  FOOTER
 
-def build_msg(contact_name, contact_quoted, msg):
-  if contact_name == CONTACT_NAME:
+def build_msg(sender, reciever, msg):
+  if sender == MYSELF:
     offset = "offset-md-5"
-    css = "mycontact"
-  elif contact_name == MYSELF:
-    offset = ""
     css = "myself"
+  elif sender == CONTACT_NAME:
+    offset = ""
+    css = "mycontact"
   else:
     raise ValueError
 
@@ -70,7 +70,7 @@ def build_msg(contact_name, contact_quoted, msg):
         for p in quoted_msg.parts:
           if p.filename and p.part_quote == 0:
             quote_filename_css += FILENAME.format(filename=ATTACHMENT_DIR+p.filename)
-        quote_css = QUOTE.format(contact_quoted = contact_quoted, quote = msg.quote_body, quote_date = quoted_msg.date, css = css, quote_filename = quote_filename_css, offset = offset)
+        quote_css = QUOTE.format(contact_quoted = reciever, quote = msg.quote_body, quote_date = quoted_msg.date, css = css, quote_filename = quote_filename_css, offset = offset)
 
     if msg.parts:
       for p in msg.parts:
@@ -80,7 +80,7 @@ def build_msg(contact_name, contact_quoted, msg):
     if msg.body == '' and not msg.parts:
       return ''
 
-  return TEMPLATE.format(contact_name = contact_quoted, date = msg_date, quoted_msg = quote_css, msg_sent = msg.body, filename_sent = filename_css, css = css, offset = offset, reactions=reactions_css)
+  return TEMPLATE.format(contact_name = sender, date = msg_date, quoted_msg = quote_css, msg_sent = msg.body, filename_sent = filename_css, css = css, offset = offset, reactions=reactions_css)
 
 
 def save_msg(output_dir, msg_dict):
@@ -106,9 +106,9 @@ def save_msg(output_dir, msg_dict):
       html_result.write(build_header())
 
     if msgi.msg_type == SMS_RECV:
-      html_result.write(build_msg(MYSELF, CONTACT_NAME, msgi))
+      html_result.write(build_msg(sender = CONTACT_NAME, reciever = MYSELF, msg = msgi))
     elif msgi.msg_type == SMS_SENT:
-      html_result.write(build_msg(CONTACT_NAME, MYSELF, msgi))
+      html_result.write(build_msg(sender = MYSELF, reciever = CONTACT_NAME, msg = msgi))
     elif msgi.msg_type in SMS_NULL:
         pass
     else:
