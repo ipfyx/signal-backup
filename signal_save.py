@@ -147,9 +147,11 @@ def generate_index(output_dir, files):
   html_result.write(build_footer())
   html_result.close()
 
-def remove_attachment(db_cursor, thread_id):
+def remove_attachment(db_cursor, contact_name):
 
-  unused = fetch_part_not_used(db_cursor, thread_id)
+  contact = fetch_contact(db_cursor, contact_name = contact_name)
+
+  unused = fetch_part_not_used(db_cursor, contact.thread_id)
   for part in unused:
     file_to_remove = Path(ATTACHMENT_DIR + part.filename)
     print(file_to_remove)
@@ -192,4 +194,4 @@ if __name__ == "__main__":
   create_output_dir(args.html_output_dir)
 
   save_msg(args.html_output_dir, db_cursor, args.contact_name)
-  #remove_attachment(db_cursor, args.thread_id)
+  remove_attachment(db_cursor, args.contact_name)
