@@ -119,6 +119,7 @@ def save_msg(output_dir, db_cursor, my_name, contact_name=None, group_name=None)
     contact = fetch_contact(db_cursor, contact_name = contact_name)
   elif group_name:
     contact = fetch_group(db_cursor, group_name = group_name)
+
   CONTACT_DICT[contact.id] = contact 
 
   msg_dict = OrderedDict(sorted(fetch_contact_msg(db_cursor, contact.thread_id).items()))
@@ -203,6 +204,9 @@ if __name__ == "__main__":
   parser.add_argument("--you", "-m", dest="my_name", help="Your name", type=str)
   parser.add_argument("--output_dir", "-o", dest="html_output_dir", help="html output dir", type=str)
   args = parser.parse_args()
+
+  if all(v is None for v in {args.contact_name, args.group_name}):
+    raise ValueError('Expected contact_name or group_name args')
 
   ATTACHMENT_DIR = args.attachment_dir+'/'
 
