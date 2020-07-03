@@ -215,5 +215,5 @@ if __name__ == "__main__":
 
   create_output_dir(args.html_output_dir)
 
-  save_msg(args.html_output_dir, db_cursor, args.my_name, contact_name = args.contact_name, group_name = group_name)
+  save_msg(args.html_output_dir, db_cursor, args.my_name, contact_name = args.contact_name, group_name = args.group_name)
   #remove_attachment(db_cursor, args.contact_name)
