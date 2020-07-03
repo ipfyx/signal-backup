@@ -111,3 +111,16 @@ class CONTACT(object):
 
   def __repr__(self):
     return "id : {}, name : {}, color : {}, phone : {}, thread_id : {}".format(self.id, self.name, self.color, self.phone, self.thread_id)
+
+class GROUP(object):
+  def __init__(self, _id, name, contact_id, thread_id):
+    self.id = int(_id)
+    self.name = name
+    self.thread_id = int(contact_id)
+    self.thread_id = int(thread_id)
+
+  def __str__(self):
+    return self.__repr__()
+
+  def __repr__(self):
+    return "id : {}, name : {}, contact_id : {}, thread_id : {}".format(self.id, self.name, self.contact_id, self.thread_id)
