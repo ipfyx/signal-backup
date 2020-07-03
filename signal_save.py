@@ -52,16 +52,16 @@ def fetch_contact(db_cursor, contact_name=None, _id=None):
     raise ValueError('{} was not found in db'.format(contact_name))
 
 def fetch_group(db_cursor, group_name=None, _id=None):
-  if contact_name:
-    db_cursor.execute("SELECT group._id, group.title, group.recipient_id, thread._id FROM groups INNER JOIN thread ON group.recipient_id = thread.recipient_ids WHERE group.title={}".format(group_name))
+  if group_name:
+    db_cursor.execute("SELECT groups._id, groups.title, groups.members, groups.recipient_id, thread._id FROM groups INNER JOIN thread ON groups.recipient_id = thread.recipient_ids WHERE groups.title='{}'".format(group_name))
   elif _id:
-    db_cursor.execute("SELECT group._id, group.title, group.recipient_id, thread._id FROM groups INNER JOIN thread ON group.recipient_id = thread.recipient_ids WHERE group._id={}".format(_id))
+    db_cursor.execute("SELECT groups._id, groups.title, groups.members, groups.recipient_id, thread._id FROM groups INNER JOIN thread ON groups.recipient_id = thread.recipient_ids WHERE groups._id={}".format(_id))
   else:
     raise ValueError('Please specify a group name on an id')
 
   group = db_cursor.fetchone()
   if group:
-    return GROUP(group[0], group[1], group[2], group[3])
+    return GROUP(group[0], group[1], group[2], group[3], group[4])
   else:
     raise ValueError('{} was not found in db'.format(group_name))
 

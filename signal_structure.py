@@ -113,7 +113,7 @@ class CONTACT(object):
     return "id : {}, name : {}, color : {}, phone : {}, thread_id : {}".format(self.id, self.name, self.color, self.phone, self.thread_id)
 
 class GROUP(object):
-  def __init__(self, _id, name, member, contact_id, thread_id):
+  def __init__(self, _id, name, members, contact_id, thread_id):
     self.id = int(_id)
     self.name = name
     self.members = [int(m) for m in members.split(',')]
