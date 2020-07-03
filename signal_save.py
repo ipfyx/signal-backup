@@ -49,7 +49,21 @@ def fetch_contact(db_cursor, contact_name=None, _id=None):
   if contact:
     return CONTACT(contact[0], contact[1], contact[2], contact[3], contact[4])
   else:
-    raise ValueError(contact_name + 'was not found in db')
+    raise ValueError('{} was not found in db'.format(contact_name))
+
+def fetch_group(db_cursor, group_name=None, _id=None):
+  if contact_name:
+    db_cursor.execute("SELECT group._id, group.title, group.recipient_id, thread._id FROM groups INNER JOIN thread ON group.recipient_id = thread.recipient_ids WHERE group.title={}".format(group_name))
+  elif _id:
+    db_cursor.execute("SELECT group._id, group.title, group.recipient_id, thread._id FROM groups INNER JOIN thread ON group.recipient_id = thread.recipient_ids WHERE group._id={}".format(_id))
+  else:
+    raise ValueError('Please specify a group name on an id')
+
+  group = db_cursor.fetchone()
+  if group:
+    return GROUP(group[0], group[1], group[2], group[3])
+  else:
+    raise ValueError('{} was not found in db'.format(group_name))
 
 def build_header():
   return HEAD + NAVBAR
@@ -99,9 +113,12 @@ def build_msg(sender, reciever, msg, msg_dict):
   return TEMPLATE.format(contact_name = sender, date = msg_date, quoted_msg = quote_css, msg_sent = msg.body, filename_sent = filename_css, css = css, offset = offset, reactions=reactions_css)
 
 
-def save_msg(output_dir, db_cursor, my_name, contact_name):
+def save_msg(output_dir, db_cursor, my_name, contact_name=None, group_name=None):
 
-  contact = fetch_contact(db_cursor, contact_name = contact_name)
+  if contact_name: 
+    contact = fetch_contact(db_cursor, contact_name = contact_name)
+  elif group_name:
+    contact = fetch_group(db_cursor, group_name = group_name)
   CONTACT_DICT[contact.id] = contact 
 
   msg_dict = OrderedDict(sorted(fetch_contact_msg(db_cursor, contact.thread_id).items()))
