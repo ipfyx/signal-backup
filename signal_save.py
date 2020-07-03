@@ -120,6 +120,9 @@ def save_msg(output_dir, db_cursor, my_name, contact_name=None, group_name=None)
   elif group_name:
     contact = fetch_group(db_cursor, group_name = group_name)
 
+    for id_contact in contact.members:
+      CONTACT_DICT[id_contact] = fetch_contact(db_cursor, _id = id_contact)
+
   CONTACT_DICT[contact.id] = contact 
 
   msg_dict = OrderedDict(sorted(fetch_contact_msg(db_cursor, contact.thread_id).items()))
