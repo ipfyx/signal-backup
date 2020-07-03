@@ -9,7 +9,7 @@ from pdb import pm,set_trace
 from datetime import datetime
 from collections import OrderedDict
 from CSS import *
-from signal_structure import MMS, SMS, PART, CONTACT, SMS_SENT, SMS_RECV, SMS_NULL
+from signal_structure import *
 
 def fetch_contact_msg(db_cursor, thread_id):
   # MMS
