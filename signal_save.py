@@ -153,7 +153,7 @@ def save_msg(output_dir, db_cursor, my_name, contact_name=None, group_name=None)
         html_result.close()
 
       cur_date_filename = '{}'.format(datetime.strftime(cur_date,"%B-%Y"))
-      months[cur_date_filename] = STATS(my_name, contact_name)
+      months[cur_date_filename] = STATS(my_name, contact.name)
       html_result = open(output_dir + '/' + cur_date_filename, 'a')
       html_result.write(build_header())
 
@@ -164,7 +164,7 @@ def save_msg(output_dir, db_cursor, my_name, contact_name=None, group_name=None)
       html_result.write(build_msg(sender = MYSELF.id, reciever = msgi.address, msg = msgi, msg_dict = msg_dict))
       months[cur_date_filename].nbr_sent += 1
     elif msgi.msg_type in SMS_NULL:
-        pass
+        print(msgi)
     else:
         print(msgi)
   
