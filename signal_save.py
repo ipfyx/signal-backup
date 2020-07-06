@@ -225,7 +225,7 @@ if __name__ == "__main__":
   parser = argparse.ArgumentParser()
   parser.add_argument("--db", dest="db_path", help="Path to signal_backup.db file", type=str)
   parser.add_argument("--attachment", "-a", dest="attachment_dir", help="Path to attachment directory", type=str)
-  parser.add_argument("--conv_name", "-cn", dest="conv_name", help="Name of the conversation you wish to display", type=str)
+  parser.add_argument("--conv_name", "-cn", nargs='+', dest="conv_name", help="Name of the conversation you wish to display")
   parser.add_argument("--you", "-m", dest="my_name", help="Your name", type=str)
   parser.add_argument("--output_dir", "-o", dest="html_output_dir", help="html output dir", type=str)
   args = parser.parse_args()
@@ -241,5 +241,6 @@ if __name__ == "__main__":
 
   create_output_dir(args.html_output_dir)
 
-  save_msg(args.html_output_dir, db_cursor, args.my_name, conv_name = args.conv_name)
+  for conv in args.conv_name:
+    save_msg(args.html_output_dir, db_cursor, args.my_name, conv_name = conv)
   #remove_attachment(db_cursor, args.contact_name)
