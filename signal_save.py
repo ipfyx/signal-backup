@@ -30,8 +30,10 @@ def fetch_contact_msg(db_cursor, thread_id):
 
   return msg
   
-def fetch_part_not_used(db_cursor, thread_id):
-  db_cursor.execute("select part._id, part.ct, part.unique_id, part.quote FROM PART INNER JOIN mms ON part.mid = mms._id WHERE thread_id!= ? ", (thread_id,))
+def fetch_part_not_used(db_cursor, thread_ids):
+  param = '(?' + ',?'*(len(thread_ids)-1) + ')'
+  request = "select part._id, part.ct, part.unique_id, part.quote FROM PART INNER JOIN mms ON part.mid = mms._id WHERE thread_id not in {}".format(param)
+  db_cursor.execute(request, thread_ids)
   parts = []
   for p in db_cursor.fetchall():
     parts.append(PART(p[0],p[1],p[2],p[3]))
