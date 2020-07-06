@@ -126,6 +126,9 @@ def save_msg(output_dir, db_cursor, my_name, contact_name=None, group_name=None)
   CONTACT_DICT[contact.id] = contact 
 
   msg_dict = OrderedDict(sorted(fetch_contact_msg(db_cursor, contact.thread_id).items()))
+  if not msg_dict:
+    print('Nothing to save')
+    return
 
   html_result = None
   cur_date = datetime.fromtimestamp(0)
