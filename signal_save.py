@@ -131,6 +131,8 @@ def save_msg(output_dir, db_cursor, my_name, contact_name=None, group_name=None)
     return
 
   html_result = None
+  msg_sent = 0
+  msg_recv = 0
   cur_date = datetime.fromtimestamp(0)
 
   files = []
@@ -145,15 +147,17 @@ def save_msg(output_dir, db_cursor, my_name, contact_name=None, group_name=None)
         html_result.write(build_footer())
         html_result.close()
 
-      cur_date_filename = '{}.html'.format(datetime.strftime(cur_date,"%B-%Y"))
+      cur_date_filename = '{}'.format(datetime.strftime(cur_date,"%B-%Y"))
       files.append(cur_date_filename)
       html_result = open(output_dir + '/' + cur_date_filename, 'a')
       html_result.write(build_header())
 
     if msgi.msg_type == SMS_RECV:
       html_result.write(build_msg(sender = msgi.address, reciever = MYSELF.id, msg = msgi, msg_dict = msg_dict))
+      msg_recv += 1
     elif msgi.msg_type == SMS_SENT:
       html_result.write(build_msg(sender = MYSELF.id, reciever = msgi.address, msg = msgi, msg_dict = msg_dict))
+      msg_sent += 1
     elif msgi.msg_type in SMS_NULL:
         pass
     else:
@@ -161,12 +165,12 @@ def save_msg(output_dir, db_cursor, my_name, contact_name=None, group_name=None)
   
   html_result.write(build_footer())
   html_result.close()
-  generate_index(output_dir, files)
+  generate_index(output_dir, files, msg_sent, msg_recv)
 
-def generate_index(output_dir, files):
+def generate_index(output_dir, files, msg_sent, msg_recv):
   html_result = open(output_dir + '/index.html', 'w')
   html_result.write(build_header())
-
+  html_result.write(NBR_MSG.format(msg_sent=msg_sent, msg_recv=msg_recv))
   for link in files:
     html_result.write(INDEX.format(link=link))
 
