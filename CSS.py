@@ -114,14 +114,14 @@ QUOTE = """
         </div>
 """
 
-NBR_MSG = """
+TOTAL = """
       <section class="row">
         <div class="col-md-6 msg_myself">
           <p>
-            sent : {msg_sent}
+            sent : {total_sent}
           </p>
           <p>
-            recieved : {msg_recv}
+            recieved : {total_recv}
           </p>
       </section>
   """
@@ -132,6 +132,10 @@ INDEX = """
         <div class="col-md-6 msg_myself">
           <p>
             <a href="{link}">{link}</a>
+          </p>
+          <p>
+            Sent by {sender} : {msg_sent} messages <br>
+            Recieved by {reciever} : {msg_recv} messages
           </p>
       </section>
   """
