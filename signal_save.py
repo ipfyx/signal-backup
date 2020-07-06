@@ -115,6 +115,13 @@ def build_msg(sender, reciever, msg, msg_dict):
 
 def save_msg(output_dir, db_cursor, my_name, contact_name=None, group_name=None):
 
+  class STATS(object):
+    def __init__(self, sender, reciever, nbr_sent=0, nbr_recv=0):
+      self.sender = sender
+      self.reciever = reciever
+      self.nbr_sent = nbr_sent
+      self.nbr_recv = nbr_recv
+
   if contact_name: 
     contact = fetch_contact(db_cursor, contact_name = contact_name)
   elif group_name:
@@ -131,11 +138,9 @@ def save_msg(output_dir, db_cursor, my_name, contact_name=None, group_name=None)
     return
 
   html_result = None
-  msg_sent = 0
-  msg_recv = 0
   cur_date = datetime.fromtimestamp(0)
 
-  files = []
+  months = {}
 
   for msg_key, msgi in msg_dict.items():
     msg_date = datetime.fromtimestamp(msg_key//1000)
@@ -148,16 +153,16 @@ def save_msg(output_dir, db_cursor, my_name, contact_name=None, group_name=None)
         html_result.close()
 
       cur_date_filename = '{}'.format(datetime.strftime(cur_date,"%B-%Y"))
-      files.append(cur_date_filename)
+      months[cur_date_filename] = STATS(my_name, contact_name)
       html_result = open(output_dir + '/' + cur_date_filename, 'a')
       html_result.write(build_header())
 
     if msgi.msg_type == SMS_RECV:
       html_result.write(build_msg(sender = msgi.address, reciever = MYSELF.id, msg = msgi, msg_dict = msg_dict))
-      msg_recv += 1
+      months[cur_date_filename].nbr_recv += 1
     elif msgi.msg_type == SMS_SENT:
       html_result.write(build_msg(sender = MYSELF.id, reciever = msgi.address, msg = msgi, msg_dict = msg_dict))
-      msg_sent += 1
+      months[cur_date_filename].nbr_sent += 1
     elif msgi.msg_type in SMS_NULL:
         pass
     else:
@@ -165,14 +170,20 @@ def save_msg(output_dir, db_cursor, my_name, contact_name=None, group_name=None)
   
   html_result.write(build_footer())
   html_result.close()
-  generate_index(output_dir, files, msg_sent, msg_recv)
+  generate_index(output_dir, months)
 
-def generate_index(output_dir, files, msg_sent, msg_recv):
+def generate_index(output_dir, months):
   html_result = open(output_dir + '/index.html', 'w')
   html_result.write(build_header())
-  html_result.write(NBR_MSG.format(msg_sent=msg_sent, msg_recv=msg_recv))
-  for link in files:
-    html_result.write(INDEX.format(link=link))
+  total_sent = 0
+  total_recv = 0
+
+  for month, stats in months.items():
+    html_result.write(INDEX.format(link=month, sender=stats.sender, reciever = stats.reciever, msg_sent=stats.nbr_sent, msg_recv=stats.nbr_recv))
+    total_sent += stats.nbr_sent
+    total_recv += stats.nbr_recv
+
+  html_result.write(TOTAL.format(total_sent=total_sent, total_recv=total_recv))
 
   html_result.write(build_footer())
   html_result.close()
