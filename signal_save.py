@@ -39,9 +39,9 @@ def fetch_part_not_used(db_cursor, thread_id):
 
 def fetch_contact(db_cursor, contact_name=None, _id=None):
   if _id:
-    db_cursor.execute("SELECT recipient._id, recipient.phone, recipient.color, recipient.signal_profile_name, thread._id FROM recipient INNER JOIN thread ON recipient._id = thread.recipient_ids WHERE recipient._id={}".format(_id))
+    db_cursor.execute("SELECT recipient._id, recipient.phone, recipient.color, recipient.signal_profile_name, thread._id FROM recipient LEFT JOIN thread ON recipient._id = thread.recipient_ids WHERE recipient._id={}".format(_id))
   elif contact_name:
-    db_cursor.execute("SELECT recipient._id, recipient.phone, recipient.color, recipient.signal_profile_name, thread._id FROM recipient INNER JOIN thread ON recipient._id = thread.recipient_ids WHERE recipient.signal_profile_name='{}'".format(contact_name))
+    db_cursor.execute("SELECT recipient._id, recipient.phone, recipient.color, recipient.signal_profile_name, thread._id FROM recipient LEFT JOIN thread ON recipient._id = thread.recipient_ids WHERE recipient.signal_profile_name='{}'".format(contact_name))
   else:
     raise ValueError('Please specify a name on an id')
 
@@ -53,9 +53,9 @@ def fetch_contact(db_cursor, contact_name=None, _id=None):
 
 def fetch_group(db_cursor, group_name=None, _id=None):
   if group_name:
-    db_cursor.execute("SELECT groups._id, groups.title, groups.members, groups.recipient_id, thread._id FROM groups INNER JOIN thread ON groups.recipient_id = thread.recipient_ids WHERE groups.title='{}'".format(group_name))
+    db_cursor.execute("SELECT groups._id, groups.title, groups.members, groups.recipient_id, thread._id FROM groups LEFT JOIN thread ON groups.recipient_id = thread.recipient_ids WHERE groups.title='{}'".format(group_name))
   elif _id:
-    db_cursor.execute("SELECT groups._id, groups.title, groups.members, groups.recipient_id, thread._id FROM groups INNER JOIN thread ON groups.recipient_id = thread.recipient_ids WHERE groups._id={}".format(_id))
+    db_cursor.execute("SELECT groups._id, groups.title, groups.members, groups.recipient_id, thread._id FROM groups LEFT JOIN thread ON groups.recipient_id = thread.recipient_ids WHERE groups._id={}".format(_id))
   else:
     raise ValueError('Please specify a group name on an id')
 
