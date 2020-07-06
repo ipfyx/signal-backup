@@ -100,7 +100,7 @@ def build_msg(sender, reciever, msg, msg_dict):
           if p.filename and p.part_quote == 0:
             quote_filename_css += FILENAME.format(filename=ATTACHMENT_DIR+p.filename)
         contact_quoted = CONTACT_DICT[msg.quote_author].name
-        quote_css = QUOTE.format(contact_quoted = contact_quoted, quote = msg.quote_body, quote_date = quoted_msg.date, css = css, quote_filename = quote_filename_css, offset = offset)
+        quote_css = QUOTE.format(contact_quoted = contact_quoted, quote = msg.quote_body, quote_date = quote_date, css = css, quote_filename = quote_filename_css, offset = offset)
 
     if msg.parts:
       for p in msg.parts:
