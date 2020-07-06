@@ -13,7 +13,7 @@ from signal_structure import *
 
 def fetch_contact_msg(db_cursor, thread_id):
   # MMS
-  db_cursor.execute("select date, address, msg_box, body, quote_id, quote_author, quote_body, reactions, part._id, part.ct, part.unique_id, part.quote FROM MMS LEFT JOIN part ON part.mid = MMS._id WHERE thread_id={}".format(thread_id))
+  db_cursor.execute("select date, address, msg_box, body, quote_id, quote_author, quote_body, reactions, part._id, part.ct, part.unique_id, part.quote FROM MMS LEFT JOIN part ON part.mid = MMS._id WHERE thread_id = ?", (thread_id,))
   msg = OrderedDict()
   for m in db_cursor.fetchall():
     mms = msg.get(m[0])
@@ -22,7 +22,7 @@ def fetch_contact_msg(db_cursor, thread_id):
     else:
       msg[m[0]] = MMS(m[0],m[1],m[2],m[3],m[4],m[5],m[6],m[7],m[8],m[9],m[10],m[11])
 
-  db_cursor.execute("select thread_id, address, date_sent, type, body, reactions FROM sms where thread_id=={}".format(thread_id))
+  db_cursor.execute("select thread_id, address, date_sent, type, body, reactions FROM sms where thread_id = ?", (thread_id,))
   for s in db_cursor.fetchall():
     if msg.get(s[2]):
       raise ValueError
@@ -31,7 +31,7 @@ def fetch_contact_msg(db_cursor, thread_id):
   return msg
   
 def fetch_part_not_used(db_cursor, thread_id):
-  db_cursor.execute("select part._id, part.ct, part.unique_id, part.quote FROM PART INNER JOIN mms ON part.mid = mms._id WHERE thread_id!={}".format(thread_id))
+  db_cursor.execute("select part._id, part.ct, part.unique_id, part.quote FROM PART INNER JOIN mms ON part.mid = mms._id WHERE thread_id!= ? ", (thread_id,))
   parts = []
   for p in db_cursor.fetchall():
     parts.append(PART(p[0],p[1],p[2],p[3]))
@@ -39,9 +39,9 @@ def fetch_part_not_used(db_cursor, thread_id):
 
 def fetch_contact(db_cursor, contact_name=None, _id=None):
   if _id:
-    db_cursor.execute("SELECT recipient._id, recipient.phone, recipient.color, recipient.signal_profile_name, thread._id FROM recipient LEFT JOIN thread ON recipient._id = thread.recipient_ids WHERE recipient._id={}".format(_id))
+    db_cursor.execute("SELECT recipient._id, recipient.phone, recipient.color, recipient.signal_profile_name, thread._id FROM recipient LEFT JOIN thread ON recipient._id = thread.recipient_ids WHERE recipient._id = ?", (_id,))
   elif contact_name:
-    db_cursor.execute("SELECT recipient._id, recipient.phone, recipient.color, recipient.signal_profile_name, thread._id FROM recipient LEFT JOIN thread ON recipient._id = thread.recipient_ids WHERE recipient.signal_profile_name='{}'".format(contact_name))
+    db_cursor.execute("SELECT recipient._id, recipient.phone, recipient.color, recipient.signal_profile_name, thread._id FROM recipient LEFT JOIN thread ON recipient._id = thread.recipient_ids WHERE recipient.signal_profile_name = ?", (contact_name,))
   else:
     raise ValueError('Please specify a name on an id')
 
@@ -53,9 +53,9 @@ def fetch_contact(db_cursor, contact_name=None, _id=None):
 
 def fetch_group(db_cursor, group_name=None, _id=None):
   if group_name:
-    db_cursor.execute("SELECT groups._id, groups.title, groups.members, groups.recipient_id, thread._id FROM groups LEFT JOIN thread ON groups.recipient_id = thread.recipient_ids WHERE groups.title='{}'".format(group_name))
+    db_cursor.execute("SELECT groups._id, groups.title, groups.members, groups.recipient_id, thread._id FROM groups LEFT JOIN thread ON groups.recipient_id = thread.recipient_ids WHERE groups.title = ?", (group_name,))
   elif _id:
-    db_cursor.execute("SELECT groups._id, groups.title, groups.members, groups.recipient_id, thread._id FROM groups LEFT JOIN thread ON groups.recipient_id = thread.recipient_ids WHERE groups._id={}".format(_id))
+    db_cursor.execute("SELECT groups._id, groups.title, groups.members, groups.recipient_id, thread._id FROM groups LEFT JOIN thread ON groups.recipient_id = thread.recipient_ids WHERE groups._id = ?", (_id,))
   else:
     raise ValueError('Please specify a group name on an id')
 
