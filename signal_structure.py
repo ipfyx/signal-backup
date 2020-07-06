@@ -104,7 +104,10 @@ class CONTACT(object):
     self.name = name
     self.phone = phone
     self.color = color
-    self.thread_id = int(thread_id)
+    try:
+      self.thread_id = int(thread_id)
+    except TypeError:
+      self.thread_id = None
 
   def __str__(self):
     return self.__repr__()
