@@ -159,7 +159,7 @@ def save_msg(output_dir, db_cursor, my_name, conv_name):
 
       cur_date_filename = '{}'.format(datetime.strftime(cur_date,"%B-%Y"))
       months[cur_date_filename] = STATS(my_name, contact.name)
-      html_result = open(output_dir + '/' + cur_date_filename, 'a')
+      html_result = open("{}/{}".format(output_dir, cur_date_filename), 'a')
       html_result.write(build_header())
 
     if msgi.msg_type == SMS_RECV:
@@ -204,7 +204,6 @@ def remove_attachment(db_cursor, contact_name):
     #file_to_remove.unlink()
 
 def create_output_dir(output_dir):
-  output_dir += "/"
   bootstrap_dir = "bootstrap/css/"
   bootstrap_css = "bootstrap.css"
   signal_css = "signal.css"
@@ -239,8 +238,9 @@ if __name__ == "__main__":
   MYSELF = fetch_contact(db_cursor, contact_name = args.my_name)
   CONTACT_DICT[MYSELF.id] = MYSELF
 
-  create_output_dir(args.html_output_dir)
 
   for conv in args.conv_name:
-    save_msg(args.html_output_dir, db_cursor, args.my_name, conv_name = conv)
+    output_dir = "{}/{}/".format(args.html_output_dir, conv)
+    create_output_dir(output_dir)
+    save_msg(output_dir, db_cursor, args.my_name, conv_name = conv)
   #remove_attachment(db_cursor, args.contact_name)
