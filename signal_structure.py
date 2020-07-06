@@ -121,7 +121,10 @@ class GROUP(object):
     self.name = name
     self.members = [int(m) for m in members.split(',')]
     self.thread_id = int(contact_id)
-    self.thread_id = int(thread_id)
+    try:
+      self.thread_id = int(thread_id)
+    except TypeError:
+      self.thread_id = None
 
   def __str__(self):
     return self.__repr__()
