@@ -63,7 +63,7 @@ def fetch_group(db_cursor, group_name=None, _id=None):
   if group:
     return GROUP(group[0], group[1], group[2], group[3], group[4])
   else:
-    raise ValueError('{} was not found in db'.format(group_name))
+    return
 
 def build_header():
   return HEAD + NAVBAR
@@ -113,7 +113,7 @@ def build_msg(sender, reciever, msg, msg_dict):
   return TEMPLATE.format(contact_name = sender, date = msg_date, quoted_msg = quote_css, msg_sent = msg.body, filename_sent = filename_css, css = css, offset = offset, reactions=reactions_css)
 
 
-def save_msg(output_dir, db_cursor, my_name, contact_name=None, group_name=None):
+def save_msg(output_dir, db_cursor, my_name, conv_name):
 
   class STATS(object):
     def __init__(self, sender, reciever, nbr_sent=0, nbr_recv=0):
@@ -122,13 +122,18 @@ def save_msg(output_dir, db_cursor, my_name, contact_name=None, group_name=None)
       self.nbr_sent = nbr_sent
       self.nbr_recv = nbr_recv
 
-  if contact_name: 
-    contact = fetch_contact(db_cursor, contact_name = contact_name)
-  elif group_name:
-    contact = fetch_group(db_cursor, group_name = group_name)
+  contact = fetch_group(db_cursor, conv_name)
 
+  if not contact:
+    # contact is a simple person
+    contact = fetch_contact(db_cursor, conv_name)
+  else:
+    # contact is a group
     for id_contact in contact.members:
       CONTACT_DICT[id_contact] = fetch_contact(db_cursor, _id = id_contact)
+ 
+  if not contact:
+    raise ValueError('{} conversation does not exists'.format(conv_name))
 
   CONTACT_DICT[contact.id] = contact 
 
@@ -220,14 +225,10 @@ if __name__ == "__main__":
   parser = argparse.ArgumentParser()
   parser.add_argument("--db", dest="db_path", help="Path to signal_backup.db file", type=str)
   parser.add_argument("--attachment", "-a", dest="attachment_dir", help="Path to attachment directory", type=str)
-  parser.add_argument("--contact_name", "-cn", dest="contact_name", help="Name of the contact you wish to display", type=str)
-  parser.add_argument("--group_name", "-gn", dest="group_name", help="Name of the contact you wish to display", type=str)
+  parser.add_argument("--conv_name", "-cn", dest="conv_name", help="Name of the conversation you wish to display", type=str)
   parser.add_argument("--you", "-m", dest="my_name", help="Your name", type=str)
   parser.add_argument("--output_dir", "-o", dest="html_output_dir", help="html output dir", type=str)
   args = parser.parse_args()
-
-  if all(v is None for v in {args.contact_name, args.group_name}):
-    raise ValueError('Expected contact_name or group_name args')
 
   ATTACHMENT_DIR = args.attachment_dir+'/'
 
@@ -240,5 +241,5 @@ if __name__ == "__main__":
 
   create_output_dir(args.html_output_dir)
 
-  save_msg(args.html_output_dir, db_cursor, args.my_name, contact_name = args.contact_name, group_name = args.group_name)
+  save_msg(args.html_output_dir, db_cursor, args.my_name, conv_name = args.conv_name)
   #remove_attachment(db_cursor, args.contact_name)
