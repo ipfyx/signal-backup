@@ -114,6 +114,19 @@ QUOTE = """
         </div>
 """
 
+NBR_MSG = """
+      <section class="row">
+        <div class="col-md-6 msg_myself">
+          <p>
+            sent : {msg_sent}
+          </p>
+          <p>
+            recieved : {msg_recv}
+          </p>
+      </section>
+  """
+
+
 INDEX = """
       <section class="row">
         <div class="col-md-6 msg_myself">
