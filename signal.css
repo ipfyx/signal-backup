@@ -1,3 +1,21 @@
+:root {
+  --light_grey:#e9e9e9;
+  --grey:#a5bca8;
+  --light_blue: #b2c9b5;
+
+  --teal: #004D40;
+  --red: #B71C1C;
+  --purple: #4A148C;
+  --pink: #880E4F;
+  --orange: #E65100;
+  --light_green: #33691E;
+  --indigo: #1A237E;
+  --green: #33691E;
+  --brown: #3E2723;
+  --blue_grey: #263238;
+  --blue: #0D47A1;
+}
+
 [class*="col-"] { margin-bottom: 20px; }
 img { width: 100%; }
 body { margin-top: 10px; }
@@ -12,59 +30,59 @@ text-align: left;
 }
 
 .col-md-2.react_myself{
-  background-color: #3c7845;
-  border: 2px solid #3c7845;
+  background-color: var(--green);
+  border: 2px solid var(--green);
   line-height: 40px;
   color: white;
-}
-
-.col-md-2.react_mycontact{
-  background-color: #e9e9e9;
-  border: 2px solid #e9e9e9;
-  line-height: 40px;
-  color: black;
-
-}
-
-.col-md-6.msg_myself{
-  background-color: #e9e9e9;
-  border: 2px solid #e9e9e9;
-  line-height: 40px;
-  color: black;
-}
-
-.col-md-6.msg_mycontact{
-  background-color: #3c7845;
-  border: 2px solid #3c7845;
-  line-height: 40px;
-  color: white;
-}
-
-.col-md-12.quote_myself{
-  background-color: #a5bca8;
-  border: 2px solid #a5bca8;
-  line-height: 40px;
-  color: black;
-}
-
-.col-md-12.quote_mycontact{
-  background-color: #b2c9b5;
-  border: 2px solid #b2c9b5;
-  line-height: 40px;
-  color: black;
 }
 
 .col-md-12.name_myself{
-  background-color: #a5bca8;
-  border: 2px solid #a5bca8;
+  background-color: var(--grey);
+  border: 2px solid var(--grey);
   line-height: 40px;
   margin-top: 10px;
   color: black;
 }
 
+.col-md-6.msg_myself{
+  background-color: var(--light_grey);
+  border: 2px solid var(--light_grey);
+  line-height: 40px;
+  color: black;
+}
+
+.col-md-12.quote_myself{
+  background-color: var(--grey);
+  border: 2px solid var(--grey);
+  line-height: 40px;
+  color: black;
+}
+
+.col-md-2.react_mycontact{
+  background-color: var(--light_grey);
+  border: 2px solid var(--light_grey);
+  line-height: 40px;
+  color: black;
+
+}
+
+.col-md-6.msg_mycontact{
+  background-color: var(--green);
+  border: 2px solid var(--green);
+  line-height: 40px;
+  color: white;
+}
+
+.col-md-12.quote_mycontact{
+  background-color: var(--light_blue);
+  border: 2px solid var(--light_blue);
+  line-height: 40px;
+  color: black;
+}
+
 .col-md-12.name_mycontact{
-  background-color: #b2c9b5;
-  border: 2px solid #b2c9b5;
+  background-color: var(--light_blue);
+  border: 2px solid var(--light_blue);
   line-height: 40px;
   margin-top: 10px;
   color: black;
