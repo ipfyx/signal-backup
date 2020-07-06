@@ -195,14 +195,22 @@ def generate_index(output_dir, months):
   html_result.write(build_footer())
   html_result.close()
 
-def remove_attachment(db_cursor, contact_name):
+def remove_attachment(db_cursor, conv_name):
 
-  contact = fetch_contact(db_cursor, contact_name = contact_name)
+  thread_ids = []
+  for conv in conv_name:
+    # contact is a group
+    contact = fetch_group(db_cursor, conv)
+    if not contact:
+      # contact is a simple person
+      contact = fetch_contact(db_cursor, conv)
+      thread_ids.append(contact.thread_id)
+    else:
+      thread_ids.append(contact.thread_id)
 
-  unused = fetch_part_not_used(db_cursor, contact.thread_id)
+  unused = fetch_part_not_used(db_cursor, thread_ids)
   for part in unused:
     file_to_remove = Path(ATTACHMENT_DIR + part.filename)
-    print(file_to_remove)
     #file_to_remove.unlink()
 
 def create_output_dir(output_dir):
@@ -240,9 +248,8 @@ if __name__ == "__main__":
   MYSELF = fetch_contact(db_cursor, contact_name = args.my_name)
   CONTACT_DICT[MYSELF.id] = MYSELF
 
-
   for conv in args.conv_name:
     output_dir = "{}/{}/".format(args.html_output_dir, conv)
     create_output_dir(output_dir)
     save_msg(output_dir, db_cursor, args.my_name, conv_name = conv)
-  #remove_attachment(db_cursor, args.contact_name)
+  remove_attachment(db_cursor, args.conv_name)
