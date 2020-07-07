@@ -215,7 +215,7 @@ def move_attachment(db_cursor, output_dir, conv_name):
     try:
       copy(file_to_move, att_out)
     except FileNotFoundError:
-      print(file_to_move)
+      print('Failed fo move {} because it does not exist'.format(file_to_move))
 
 def create_output_dir(output_dir):
   bootstrap_dir = "bootstrap/css/"
