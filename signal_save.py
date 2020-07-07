@@ -210,10 +210,10 @@ def move_attachment(db_cursor, output_dir, conv_name):
 
   used = fetch_part_used(db_cursor, contact.thread_id)
   for part in used:
-    att_out = output_dir + 'attachment'
+    att_out = output_dir + ATTACHMENT_DIR
     file_to_move = ATTACHMENT_DIR + part.filename
     try:
-      move(file_to_move, att_out)
+      copy(file_to_move, att_out)
     except FileNotFoundError:
       print(file_to_move)
 
@@ -227,8 +227,7 @@ def create_output_dir(output_dir):
   except FileExistsError:
     raise FileExistsError("Output directory already exists, delete it or use another one.")
 
-  #Path(output_dir + 'attachment').symlink_to(Path(ATTACHMENT_DIR), target_is_directory=True)
-  Path(output_dir + 'attachment').mkdir(parents=True, exist_ok=True)
+  Path(output_dir + ATTACHMENT_DIR).mkdir(parents=True, exist_ok=True)
 
   Path(output_dir + bootstrap_dir).mkdir(parents=True, exist_ok=True)
   copy(bootstrap_dir + bootstrap_css, output_dir + bootstrap_dir)
