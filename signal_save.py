@@ -3,7 +3,7 @@
 
 import sqlite3
 import argparse
-from shutil import copy
+from shutil import copy, move
 from pathlib import Path
 from pdb import pm,set_trace
 from datetime import datetime
@@ -34,6 +34,13 @@ def fetch_part_not_used(db_cursor, thread_ids):
   param = '(?' + ',?'*(len(thread_ids)-1) + ')'
   request = "select part._id, part.ct, part.unique_id, part.quote FROM PART INNER JOIN mms ON part.mid = mms._id WHERE thread_id not in {}".format(param)
   db_cursor.execute(request, thread_ids)
+  parts = []
+  for p in db_cursor.fetchall():
+    parts.append(PART(p[0],p[1],p[2],p[3]))
+  return parts
+
+def fetch_part_used(db_cursor, thread_id):
+  db_cursor.execute("select part._id, part.ct, part.unique_id, part.quote FROM PART INNER JOIN mms ON part.mid = mms._id WHERE thread_id = ?",(thread_id,))
   parts = []
   for p in db_cursor.fetchall():
     parts.append(PART(p[0],p[1],p[2],p[3]))
@@ -197,23 +204,18 @@ def generate_index(output_dir, months):
   html_result.write(build_footer())
   html_result.close()
 
-def remove_attachment(db_cursor, conv_name):
+def move_attachment(db_cursor, output_dir, conv_name):
 
-  thread_ids = []
-  for conv in conv_name:
-    # contact is a group
-    contact = fetch_group(db_cursor, conv)
-    if not contact:
-      # contact is a simple person
-      contact = fetch_contact(db_cursor, conv)
-      thread_ids.append(contact.thread_id)
-    else:
-      thread_ids.append(contact.thread_id)
+  contact = get_contact(db_cursor, conv_name)
 
-  unused = fetch_part_not_used(db_cursor, thread_ids)
-  for part in unused:
-    file_to_remove = Path(ATTACHMENT_DIR + part.filename)
-    #file_to_remove.unlink()
+  used = fetch_part_used(db_cursor, contact.thread_id)
+  for part in used:
+    att_out = output_dir + 'attachment'
+    file_to_move = ATTACHMENT_DIR + part.filename
+    try:
+      move(file_to_move, att_out)
+    except FileNotFoundError:
+      print(file_to_move)
 
 def create_output_dir(output_dir):
   bootstrap_dir = "bootstrap/css/"
@@ -225,7 +227,8 @@ def create_output_dir(output_dir):
   except FileExistsError:
     raise FileExistsError("Output directory already exists, delete it or use another one.")
 
-  Path(output_dir + 'attachment').symlink_to(Path(ATTACHMENT_DIR), target_is_directory=True)
+  #Path(output_dir + 'attachment').symlink_to(Path(ATTACHMENT_DIR), target_is_directory=True)
+  Path(output_dir + 'attachment').mkdir(parents=True, exist_ok=True)
 
   Path(output_dir + bootstrap_dir).mkdir(parents=True, exist_ok=True)
   copy(bootstrap_dir + bootstrap_css, output_dir + bootstrap_dir)
