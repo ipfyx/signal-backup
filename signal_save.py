@@ -67,6 +67,13 @@ def fetch_group(db_cursor, group_name=None, _id=None):
   else:
     return
 
+def get_contact(db_cursor, conv_name):
+  contact = fetch_group(db_cursor, conv_name)
+  if not contact:
+    # contact is a simple person
+    contact = fetch_contact(db_cursor, conv_name)
+  return contact
+
 def build_header():
   return HEAD + NAVBAR
 
@@ -124,16 +131,11 @@ def save_msg(output_dir, db_cursor, my_name, conv_name):
       self.nbr_sent = nbr_sent
       self.nbr_recv = nbr_recv
 
-  contact = fetch_group(db_cursor, conv_name)
-
-  if not contact:
-    # contact is a simple person
-    contact = fetch_contact(db_cursor, conv_name)
-  else:
-    # contact is a group
+  contact = get_contact(db_cursor, conv_name)
+  if isinstance(contact, GROUP):
     for id_contact in contact.members:
       CONTACT_DICT[id_contact] = fetch_contact(db_cursor, _id = id_contact)
- 
+
   if not contact:
     raise ValueError('{} conversation does not exists'.format(conv_name))
 
@@ -245,11 +247,11 @@ if __name__ == "__main__":
   db_cursor = conn.cursor()
 
   CONTACT_DICT = {}
-  MYSELF = fetch_contact(db_cursor, contact_name = args.my_name)
+  MYSELF = get_contact(db_cursor, contact_name = args.my_name)
   CONTACT_DICT[MYSELF.id] = MYSELF
 
   for conv in args.conv_name:
     output_dir = "{}/{}/".format(args.html_output_dir, conv)
     create_output_dir(output_dir)
     save_msg(output_dir, db_cursor, args.my_name, conv_name = conv)
-  remove_attachment(db_cursor, args.conv_name)
+  move_attachment(db_cursor, output_dir, args.conv_name)
