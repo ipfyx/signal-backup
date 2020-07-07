@@ -5,7 +5,6 @@ import sqlite3
 import argparse
 from shutil import copy, move
 from pathlib import Path
-from pdb import pm,set_trace
 from datetime import datetime
 from collections import OrderedDict
 from CSS import *
@@ -180,9 +179,9 @@ def save_msg(output_dir, db_cursor, your_name, conv_name):
       html_result.write(build_msg(sender = MYSELF.id, reciever = msgi.address, msg = msgi, msg_dict = msg_dict))
       months[cur_date_filename].nbr_sent += 1
     elif msgi.msg_type in SMS_NULL:
-        print(msgi)
+        pass
     else:
-        print(msgi)
+        pass
   
   html_result.write(build_footer())
   html_result.close()
