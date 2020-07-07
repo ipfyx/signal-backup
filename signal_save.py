@@ -96,7 +96,7 @@ def build_msg(sender, reciever, msg, msg_dict):
 
   sender = CONTACT_DICT[sender].name
 
-  msg_date = datetime.fromtimestamp(int(msg.date)//1000)
+  msg_date = datetime.fromtimestamp(int(msg.date)//1000).strftime(DATE_FORMAT)
 
   reactions_css = ''
   if msg.reactions:
@@ -109,7 +109,7 @@ def build_msg(sender, reciever, msg, msg_dict):
       quoted_msg = msg_dict.get(msg.quote_id)
       assert(msg.quote_body is not None)
       if isinstance(quoted_msg, MMS) and quoted_msg.date in msg_dict.keys():
-        quote_date = datetime.fromtimestamp(int(quoted_msg.date)//1000)
+        quote_date = datetime.fromtimestamp(int(quoted_msg.date)//1000).strftime(DATE_FORMAT)
         quote_filename_css = ''
         for p in quoted_msg.parts:
           if p.filename and p.part_quote == 0:
