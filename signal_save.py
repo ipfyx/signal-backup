@@ -150,7 +150,7 @@ def save_msg(output_dir, db_cursor, your_name, conv_name):
 
   msg_dict = OrderedDict(sorted(fetch_contact_msg(db_cursor, contact.thread_id).items()))
   if not msg_dict:
-    print('Nothing to save')
+    print(f"{colors.WARNING}Nothing to save")
     return
 
   html_result = None
@@ -216,10 +216,10 @@ def move_attachment(db_cursor, output_dir, conv_name):
     try:
       copy(file_to_move, att_out)
     except FileNotFoundError:
-      print('Failed fo move {} because it does not exist'.format(file_to_move))
+      print(f"{colors.WARNING}Failed fo move {file_to_move} because it does not exist")
     finally:
       sys.stdout.flush()
-  print("{} attachments successfuly copied\r".format(len(used)))
+  print(f"{colors.OK}{len(used)} attachments successfuly copied\r")
 
 def create_output_dir(output_dir):
   bootstrap_dir = "bootstrap/css/"
@@ -258,9 +258,10 @@ if __name__ == "__main__":
 
   for conv in args.conv_name:
     output_dir = "{}/{}/".format(args.html_output_dir, conv)
-    print("Creating outpur directory {}".format(output_dir))
+    print(f"{colors.INFO}Creating outpur directory {output_dir}")
     create_output_dir(output_dir)
-    print("Saving conversation {}".format(conv))
+    print(f"{colors.INFO}Saving conversation {conv}")
     save_msg(output_dir, db_cursor, args.your_name, conv_name = conv)
-    print("Copying attachment to {}/{}".format(output_dir,conv))
+    print(f"{colors.INFO}Copying attachment to {output_dir}/{conv}")
     move_attachment(db_cursor, output_dir, conv)
+    print(f"{colors.OK}Conversation {conv} successfuly saved")

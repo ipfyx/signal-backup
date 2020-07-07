@@ -7,6 +7,11 @@ SMS_NULL = [10747924,10747927,2,1,3]
 
 DATE_FORMAT = '%A %d-%m-%Y %H:%M:%S'
 
+class colors:
+  FAIL = '\033[91m'
+  OK = '\033[92m'
+  WARNING = '\033[93m'
+  INFO = '\033[94m'
 
 @total_ordering
 class MMS(object):
