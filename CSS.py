@@ -151,7 +151,7 @@ INDEX = """
           </p>
           <p>
             Sent by {sender} : {msg_sent} messages <br>
-            Recieved by {reciever} : {msg_recv} messages
+            Sent by {reciever} : {msg_recv} messages
           </p>
       </section>
   """
