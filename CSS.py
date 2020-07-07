@@ -103,6 +103,22 @@ FILENAME ="""
           </p>
 """
 
+VIDEO ="""
+          <p>
+          <a href="{filename}">{filename}</a>
+          <video width="540" controls <source src="{filename}" type="{type}"></video>
+          </p>
+"""
+
+PDF ="""
+          <p>
+          <a href="{filename}">
+            <embed src="{filename}" width=540/>
+          </a>
+          </p>
+"""
+
+
 QUOTE = """
         <div class="col-md-12 name_{css}">
         {contact_quoted} - {quote_date}
