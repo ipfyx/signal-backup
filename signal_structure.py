@@ -5,6 +5,8 @@ SMS_RECV = 10485780
 
 SMS_NULL = [10747924,10747927,2,1,3]
 
+DATE_FORMAT = '%A %d-%m-%Y %H:%M:%S'
+
 
 @total_ordering
 class MMS(object):
