@@ -24,8 +24,6 @@ def fetch_contact_msg(db_cursor, thread_id):
 
   db_cursor.execute("select thread_id, address, date_sent, type, body, reactions FROM sms where thread_id = ?", (thread_id,))
   for s in db_cursor.fetchall():
-    if msg.get(s[2]):
-      raise ValueError
     msg[s[2]] = SMS(s[0],s[1],s[2],s[3],s[4],s[5])
 
   return msg
@@ -52,13 +50,13 @@ def fetch_contact(db_cursor, contact_name=None, _id=None):
   elif contact_name:
     db_cursor.execute("SELECT recipient._id, recipient.phone, recipient.color, recipient.signal_profile_name, thread._id FROM recipient LEFT JOIN thread ON recipient._id = thread.recipient_ids WHERE recipient.signal_profile_name = ?", (contact_name,))
   else:
-    raise ValueError('Please specify a name on an id')
+    raise ValueError(f"{colors.FAIL}Please specify a name or an id")
 
   contact = db_cursor.fetchone()
   if contact:
     return CONTACT(contact[0], contact[1], contact[2], contact[3], contact[4])
   else:
-    raise ValueError('{} was not found in db'.format(contact_name))
+    raise ValueError(f"{colors.FAIL}{contact_name} was not found in db")
 
 def fetch_group(db_cursor, group_name=None, _id=None):
   if group_name:
@@ -66,7 +64,7 @@ def fetch_group(db_cursor, group_name=None, _id=None):
   elif _id:
     db_cursor.execute("SELECT groups._id, groups.title, groups.members, groups.recipient_id, thread._id FROM groups LEFT JOIN thread ON groups.recipient_id = thread.recipient_ids WHERE groups._id = ?", (_id,))
   else:
-    raise ValueError('Please specify a group name on an id')
+    raise ValueError(f"{colors.FAIL}Please specify a name or an id")
 
   group = db_cursor.fetchone()
   if group:
@@ -144,7 +142,7 @@ def save_msg(output_dir, db_cursor, your_name, conv_name):
       CONTACT_DICT[id_contact] = fetch_contact(db_cursor, _id = id_contact)
 
   if not contact:
-    raise ValueError('{} conversation does not exists'.format(conv_name))
+    raise ValueError(f"{colors.FAIL}{conv_name} conversation does not exists")
 
   CONTACT_DICT[contact.id] = contact 
 
@@ -229,7 +227,7 @@ def create_output_dir(output_dir):
   try:
     Path(output_dir).mkdir(parents=True)
   except FileExistsError:
-    raise FileExistsError("Output directory already exists, delete it or use another one.")
+    raise FileExistsError(f"{colors.FAIL}Output directory already exists, delete it or use another one.")
 
   Path(output_dir + ATTACHMENT_DIR).mkdir(parents=True, exist_ok=True)
 
