@@ -129,7 +129,7 @@ def build_msg(sender, reciever, msg, msg_dict):
   return TEMPLATE.format(contact_name = sender, date = msg_date, quoted_msg = quote_css, msg_sent = msg.body, filename_sent = filename_css, css = css, offset = offset, reactions=reactions_css)
 
 
-def save_msg(output_dir, db_cursor, my_name, conv_name):
+def save_msg(output_dir, db_cursor, your_name, conv_name):
 
   class STATS(object):
     def __init__(self, sender, reciever, nbr_sent=0, nbr_recv=0):
@@ -169,7 +169,7 @@ def save_msg(output_dir, db_cursor, my_name, conv_name):
         html_result.close()
 
       cur_date_filename = '{}'.format(datetime.strftime(cur_date,"%B-%Y"))
-      months[cur_date_filename] = STATS(my_name, contact.name)
+      months[cur_date_filename] = STATS(your_name, contact.name)
       html_result = open("{}/{}".format(output_dir, cur_date_filename), 'a')
       html_result.write(build_header())
 
@@ -239,7 +239,7 @@ if __name__ == "__main__":
   parser.add_argument("--db", dest="db_path", help="Path to signal_backup.db file", type=str)
   parser.add_argument("--attachment", "-a", dest="attachment_dir", help="Path to attachment directory", type=str)
   parser.add_argument("--conv_name", "-cn", nargs='+', dest="conv_name", help="Name of the conversation you wish to display")
-  parser.add_argument("--you", "-m", dest="my_name", help="Your name", type=str)
+  parser.add_argument("--yourself", "-y", dest="your_name", help="Your name", type=str)
   parser.add_argument("--output_dir", "-o", dest="html_output_dir", help="html output dir", type=str)
   args = parser.parse_args()
 
@@ -249,11 +249,11 @@ if __name__ == "__main__":
   db_cursor = conn.cursor()
 
   CONTACT_DICT = {}
-  MYSELF = get_contact(db_cursor,args.my_name)
+  MYSELF = get_contact(db_cursor,args.your_name)
   CONTACT_DICT[MYSELF.id] = MYSELF
 
   for conv in args.conv_name:
     output_dir = "{}/{}/".format(args.html_output_dir, conv)
     create_output_dir(output_dir)
-    save_msg(output_dir, db_cursor, args.my_name, conv_name = conv)
+    save_msg(output_dir, db_cursor, args.your_name, conv_name = conv)
     move_attachment(db_cursor, output_dir, conv)
