@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 # coding: utf8
 
+import sys
 import sqlite3
 import argparse
 from shutil import copy, move
@@ -209,12 +210,16 @@ def move_attachment(db_cursor, output_dir, conv_name):
 
   used = fetch_part_used(db_cursor, contact.thread_id)
   for part in used:
+    sys.stdout.write("Copying {}/{} attachments\r".format(used.index(part),len(used)-1))
     att_out = output_dir + ATTACHMENT_DIR
     file_to_move = ATTACHMENT_DIR + part.filename
     try:
       copy(file_to_move, att_out)
     except FileNotFoundError:
       print('Failed fo move {} because it does not exist'.format(file_to_move))
+    finally:
+      sys.stdout.flush()
+  print("{} attachments successfuly copied\r".format(len(used)))
 
 def create_output_dir(output_dir):
   bootstrap_dir = "bootstrap/css/"
@@ -253,6 +258,9 @@ if __name__ == "__main__":
 
   for conv in args.conv_name:
     output_dir = "{}/{}/".format(args.html_output_dir, conv)
+    print("Creating outpur directory {}".format(output_dir))
     create_output_dir(output_dir)
+    print("Saving conversation {}".format(conv))
     save_msg(output_dir, db_cursor, args.your_name, conv_name = conv)
+    print("Copying attachment to {}/{}".format(output_dir,conv))
     move_attachment(db_cursor, output_dir, conv)
