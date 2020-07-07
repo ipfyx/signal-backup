@@ -249,11 +249,11 @@ if __name__ == "__main__":
   db_cursor = conn.cursor()
 
   CONTACT_DICT = {}
-  MYSELF = get_contact(db_cursor, contact_name = args.my_name)
+  MYSELF = get_contact(db_cursor,args.my_name)
   CONTACT_DICT[MYSELF.id] = MYSELF
 
   for conv in args.conv_name:
     output_dir = "{}/{}/".format(args.html_output_dir, conv)
     create_output_dir(output_dir)
     save_msg(output_dir, db_cursor, args.my_name, conv_name = conv)
-  move_attachment(db_cursor, output_dir, args.conv_name)
+    move_attachment(db_cursor, output_dir, conv)
