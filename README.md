@@ -38,17 +38,12 @@ optional arguments:
                         Your name
   --output_dir HTML_OUTPUT_DIR, -o HTML_OUTPUT_DIR
                         html output dir
-```
 
-```
 python3 signal_backup.py --db out/signal_backup.db --attachment out/attachment/ -cn 'Conversation Name 1' "Conversation Name 2" -y 'Your Name' --o output_directory 
 ```
 
-# Basic usage
+# How does it work 
 Signal-backup requests sms and mms in the database, their parts, their quotes etc. and format them in an html page using bootstrap. The parts are then copied from the attachment directory to the attachment directory in each conversation saved.
-
-# Requirements
-None
 
 # TODO
 - Support color by contact
