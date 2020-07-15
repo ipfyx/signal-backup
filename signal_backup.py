@@ -127,7 +127,7 @@ def build_msg(sender, reciever, msg, msg_dict):
   return TEMPLATE.format(contact_name = sender, date = msg_date, quoted_msg = quote_css, msg_sent = msg.body, filename_sent = filename_css, css = css, offset = offset, reactions=reactions_css)
 
 
-def save_msg(output_dir, db_cursor, your_name, conv_name):
+def backup_msg(output_dir, db_cursor, your_name, conv_name):
 
   class STATS(object):
     def __init__(self, sender, reciever, nbr_sent=0, nbr_recv=0):
@@ -148,7 +148,7 @@ def save_msg(output_dir, db_cursor, your_name, conv_name):
 
   msg_dict = OrderedDict(sorted(fetch_contact_msg(db_cursor, contact.thread_id).items()))
   if not msg_dict:
-    print(f"{colors.WARNING}Nothing to save")
+    print(f"{colors.WARNING}Nothing to backup")
     return
 
   html_result = None
@@ -259,7 +259,7 @@ if __name__ == "__main__":
     print(f"{colors.INFO}Creating outpur directory {output_dir}")
     create_output_dir(output_dir)
     print(f"{colors.INFO}Saving conversation {conv}")
-    save_msg(output_dir, db_cursor, args.your_name, conv_name = conv)
+    backup_msg(output_dir, db_cursor, args.your_name, conv_name = conv)
     print(f"{colors.INFO}Copying attachment to {output_dir}/{conv}")
     move_attachment(db_cursor, output_dir, conv)
     print(f"{colors.OK}Conversation {conv} successfuly saved")
