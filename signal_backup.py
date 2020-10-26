@@ -56,7 +56,27 @@ def fetch_contact(db_cursor, contact_name=None, _id=None):
   if contact:
     return CONTACT(contact[0], contact[1], contact[2], contact[3], contact[4])
   else:
-    raise ValueError(f"{colors.FAIL}{contact_name} was not found in db")
+
+    # Possible contacts names
+    print(f"{colors.WARNING} Possible contacts names")
+    db_cursor.execute("SELECT recipient._id, recipient.phone, recipient.color, recipient.signal_profile_name, thread._id FROM recipient LEFT JOIN thread ON recipient._id = thread.recipient_ids")
+    contacts = db_cursor.fetchall()
+    for contact in contacts:
+      contact = CONTACT(contact[0], contact[1], contact[2], contact[3], contact[4])
+      if contact.name:
+        print(f"{colors.INFO}{contact.name}")
+
+    # Possible groups names
+    print(f"{colors.WARNING} Possible groups names")
+    db_cursor.execute("SELECT groups._id, groups.title, groups.members, groups.recipient_id, thread._id FROM groups LEFT JOIN thread ON groups.recipient_id = thread.recipient_ids")
+
+    groups = db_cursor.fetchall()
+    for group in groups:
+      group = GROUP(group[0], group[1], group[2], group[3], group[4])
+      if group.name:
+        print(f"{colors.INFO}{group.name}")
+
+    raise ValueError(f"{colors.FAIL}{contact_name} was not found in db, possible values above")
 
 def fetch_group(db_cursor, group_name=None, _id=None):
   if group_name:
