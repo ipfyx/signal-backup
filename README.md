@@ -45,7 +45,15 @@ python3 signal_backup.py --db out/signal_backup.db --attachment out/attachment/ 
 # How does it work 
 Signal-backup requests sms and mms in the database, their parts, their quotes etc. and format them in an html page using bootstrap. The parts are then copied from the attachment directory to the attachment directory in each conversation saved.
 
+# Result
+Here is the index html file it will generate. You can then click on any month to view the messages sent during that month, sender names were anonymised.
+![Alt text](example/index.png?raw=true "index.html")
+Here is the resulting conversation.
+![Alt text](example/example.png?raw=true "conv_month.html")
+
+
 # TODO
 - Support color by contact
 - Better embedding of mp4, pdf etc.
--
+- Find and fix more bugs
+- Feel free to contributes !
