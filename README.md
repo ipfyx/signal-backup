@@ -9,7 +9,7 @@ Usage :
 $ cat pass_signal
 123451234512345123451234512345
 
-$ signal-backup-decode --output-path out --attachment-path attachment --avatar-path avatar --config-path config --password_file pass_signal signal-1970-01-01-01-00-00.backup
+$ signal-backup-decode --output-path out --password-file pass_signal signal-1970-01-01-01-00-00.backup
 Database Version: ...
 Copy successful, sqlite at signal-backup/out/signal_backup.db
 
