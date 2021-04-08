@@ -19,8 +19,10 @@ def fetch_contact_msg(db_cursor, thread_id):
     mms = msg.get(m[0])
     if mms:
       mms.parts.append(PART(m[8],m[9],m[10],m[11]))
-    else:
+    elif m[4] != None:
       msg[m[0]] = MMS(m[0],m[1],m[2],m[3],m[4],m[5],m[6],m[7],m[8],m[9],m[10],m[11])
+    else:
+      print(m)
 
   db_cursor.execute("select thread_id, address, date_sent, type, body, reactions FROM sms where thread_id = ?", (thread_id,))
   for s in db_cursor.fetchall():
