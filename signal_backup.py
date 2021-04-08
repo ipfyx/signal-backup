@@ -232,7 +232,31 @@ def move_attachment(db_cursor, output_dir, conv_name):
   for part in used:
     sys.stdout.write("Copying {}/{} attachments\r".format(used.index(part),len(used)-1))
     att_out = output_dir + ATTACHMENT_DIR
-    file_to_move = ATTACHMENT_DIR + part.filename
+    if part.ct == "image/gif":
+      ext = ".gif"
+    elif part.ct == "application/pdf":
+      ext = ".pdf"
+    elif part.ct == "image/webp":
+      ext = ".webp"
+      if not Path(ATTACHMENT_DIR + part.filename + ext).is_file():
+        ext = ".png"
+    elif part.ct == "image/png":
+      ext = ".png"
+    elif part.ct == "video/mp4":
+      ext = ".mp4"
+    elif part.ct == "audio/mpeg":
+      ext = ".mp3"
+    elif part.ct == "image/jpeg":
+      ext = ".jpg"
+    elif part.ct == "image/x-icon":
+      ext = ".ico"
+    elif part.ct == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+      ext = ".docx"
+    else:
+      print(f"{colors.WARNING}File not found. Unknown file type {part.ct} for attachment {part.filename}")
+      ext = ""
+
+    file_to_move = ATTACHMENT_DIR + part.filename + ext
     try:
       copy(file_to_move, att_out)
     except FileNotFoundError:
