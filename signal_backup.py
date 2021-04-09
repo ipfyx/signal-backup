@@ -190,7 +190,7 @@ def backup_msg(output_dir, db_cursor, your_name, conv_name):
 
       cur_date_filename = '{}'.format(datetime.strftime(cur_date,"%B-%Y"))
       months[cur_date_filename] = STATS(your_name, contact.name)
-      html_result = open("{}/{}".format(output_dir, cur_date_filename), 'a')
+      html_result = open("{}/{}.html".format(output_dir, cur_date_filename), 'a')
       html_result.write(build_header())
 
     if msgi.msg_type == SMS_RECV:

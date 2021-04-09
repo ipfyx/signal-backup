@@ -147,7 +147,7 @@ INDEX = """
       <section class="row">
         <div class="col-md-6 msg_myself">
           <p>
-            <a href="{link}">{link}</a>
+            <a href="{link}.html">{link}</a>
           </p>
           <p>
             Sent by {sender} : {msg_sent} messages <br>
