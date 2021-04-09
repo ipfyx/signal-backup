@@ -134,14 +134,14 @@ def build_msg(sender, reciever, msg, msg_dict):
         quote_filename_css = ''
         for p in quoted_msg.parts:
           if p.filename and p.part_quote == 0:
-            quote_filename_css += FILENAME.format(filename=ATTACHMENT_DIR+p.filename)
+            quote_filename_css += FILENAME.format(filename=ATTACHMENT_DIR+add_file_extension(p))
         contact_quoted = CONTACT_DICT[msg.quote_author].name
         quote_css = QUOTE.format(contact_quoted = contact_quoted, quote = msg.quote_body, quote_date = quote_date, css = css, quote_filename = quote_filename_css, offset = offset)
 
     if msg.parts:
       for p in msg.parts:
         if p.part_quote == 0:
-          filename_css += FILENAME.format(filename=ATTACHMENT_DIR + p.filename)
+          filename_css += FILENAME.format(filename=ATTACHMENT_DIR + add_file_extension(p))
 
     if msg.body == '' and not msg.parts:
       return ''
@@ -224,6 +224,33 @@ def generate_index(output_dir, months):
   html_result.write(build_footer())
   html_result.close()
 
+def add_file_extension(part):
+  if part.ct == "image/gif":
+      ext = ".gif"
+  elif part.ct == "application/pdf":
+    ext = ".pdf"
+  elif part.ct == "image/webp":
+    ext = ".webp"
+    if not Path(ATTACHMENT_DIR + part.filename + ext).is_file():
+      ext = ".png"
+  elif part.ct == "image/png":
+    ext = ".png"
+  elif part.ct == "video/mp4":
+    ext = ".mp4"
+  elif part.ct == "audio/mpeg":
+    ext = ".mp3"
+  elif part.ct == "image/jpeg":
+    ext = ".jpg"
+  elif part.ct == "image/x-icon":
+    ext = ".ico"
+  elif part.ct == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+    ext = ".docx"
+  else:
+    print(f"{colors.WARNING}File not found. Unknown file type {part.ct} for attachment {part.filename}")
+    ext = ""
+  return part.filename + ext
+
+
 def move_attachment(db_cursor, output_dir, conv_name):
 
   contact = get_contact(db_cursor, conv_name)
@@ -231,32 +258,9 @@ def move_attachment(db_cursor, output_dir, conv_name):
   used = fetch_part_used(db_cursor, contact.thread_id)
   for part in used:
     sys.stdout.write("Copying {}/{} attachments\r".format(used.index(part),len(used)-1))
+    
+    file_to_move = ATTACHMENT_DIR + add_file_extension(part)
     att_out = output_dir + ATTACHMENT_DIR
-    if part.ct == "image/gif":
-      ext = ".gif"
-    elif part.ct == "application/pdf":
-      ext = ".pdf"
-    elif part.ct == "image/webp":
-      ext = ".webp"
-      if not Path(ATTACHMENT_DIR + part.filename + ext).is_file():
-        ext = ".png"
-    elif part.ct == "image/png":
-      ext = ".png"
-    elif part.ct == "video/mp4":
-      ext = ".mp4"
-    elif part.ct == "audio/mpeg":
-      ext = ".mp3"
-    elif part.ct == "image/jpeg":
-      ext = ".jpg"
-    elif part.ct == "image/x-icon":
-      ext = ".ico"
-    elif part.ct == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-      ext = ".docx"
-    else:
-      print(f"{colors.WARNING}File not found. Unknown file type {part.ct} for attachment {part.filename}")
-      ext = ""
-
-    file_to_move = ATTACHMENT_DIR + part.filename + ext
     try:
       copy(file_to_move, att_out)
     except FileNotFoundError:
