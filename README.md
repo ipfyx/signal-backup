@@ -39,7 +39,40 @@ optional arguments:
   --output_dir HTML_OUTPUT_DIR, -o HTML_OUTPUT_DIR
                         html output dir
 
+ipfyx@mysecretmachine:~/signal/signal-backup$ ls -1
+bootstrap
+CSS.py
+example
+--> out
+README.md
+signal_backup.py
+signal.css
+signal_structure.py
+
 python3 signal_backup.py --db out/signal_backup.db --attachment out/attachment/ -cn 'Conversation Name 1' "Conversation Name 2" -y 'Your Name' --o output_directory 
+Creating outpur directory backup_1970-01-01/Conversation Name 1/
+Saving conversation Conversation Name 1
+Copying attachment to backup_1970-01-01/Conversation Name 1/Conversation Name 1
+# Sometimes files are deleted Failed fo move ./out/attachment//1618845228949_15172.docx because it does not exist
+#TODO File not found. Unknown file type application/vnd.openxmlformats-officedocument.spreadsheetml.sheet for attachment 1618950490743_15207
+3396 attachments successfuly copied
+Conversation Conversation Name 1 successfuly saved
+Creating outpur directory ...
+Saving conversation ...
+Copying attachment to ...
+194 attachments successfuly copied
+Conversation ... successfuly saved
+
+ipfyx@mysecretmachine:~/signal/signal-backup$ ls -1
+--> backup_1970-01-01
+bootstrap
+CSS.py
+example
+--> out
+README.md
+signal_backup.py
+signal.css
+signal_structure.py
 ```
 
 # How does it work 
