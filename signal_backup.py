@@ -29,7 +29,7 @@ def fetch_contact_msg(db_cursor, thread_id):
     msg[s[2]] = SMS(s[0],s[1],s[2],s[3],s[4],s[5])
 
   return msg
-  
+
 def fetch_part_not_used(db_cursor, thread_ids):
   param = '(?' + ',?'*(len(thread_ids)-1) + ')'
   request = "select part._id, part.ct, part.unique_id, part.quote FROM PART INNER JOIN mms ON part.mid = mms._id WHERE thread_id not in {}".format(param)
@@ -48,9 +48,9 @@ def fetch_part_used(db_cursor, thread_id):
 
 def fetch_contact(db_cursor, contact_name=None, _id=None):
   if _id:
-    db_cursor.execute("SELECT recipient._id, recipient.phone, recipient.color, recipient.signal_profile_name, thread._id FROM recipient LEFT JOIN thread ON recipient._id = thread.recipient_ids WHERE recipient._id = ?", (_id,))
+    db_cursor.execute("SELECT recipient._id, recipient.phone, recipient.color, recipient.signal_profile_name, thread._id FROM recipient LEFT JOIN thread ON recipient._id = thread.thread_recipient_id WHERE recipient._id = ?", (_id,))
   elif contact_name:
-    db_cursor.execute("SELECT recipient._id, recipient.phone, recipient.color, recipient.signal_profile_name, thread._id FROM recipient LEFT JOIN thread ON recipient._id = thread.recipient_ids WHERE recipient.signal_profile_name = ?", (contact_name,))
+    db_cursor.execute("SELECT recipient._id, recipient.phone, recipient.color, recipient.signal_profile_name, thread._id FROM recipient LEFT JOIN thread ON recipient._id = thread.thread_recipient_id WHERE recipient.signal_profile_name = ?", (contact_name,))
   else:
     raise ValueError(f"{colors.FAIL}Please specify a name or an id")
 
@@ -61,7 +61,7 @@ def fetch_contact(db_cursor, contact_name=None, _id=None):
 
     # Possible contacts names
     print(f"{colors.WARNING} Possible contacts names")
-    db_cursor.execute("SELECT recipient._id, recipient.phone, recipient.color, recipient.signal_profile_name, thread._id FROM recipient LEFT JOIN thread ON recipient._id = thread.recipient_ids")
+    db_cursor.execute("SELECT recipient._id, recipient.phone, recipient.color, recipient.signal_profile_name, thread._id FROM recipient LEFT JOIN thread ON recipient._id = thread.thread_recipient_id")
     contacts = db_cursor.fetchall()
     for contact in contacts:
       contact = CONTACT(contact[0], contact[1], contact[2], contact[3], contact[4])
@@ -70,7 +70,7 @@ def fetch_contact(db_cursor, contact_name=None, _id=None):
 
     # Possible groups names
     print(f"{colors.WARNING} Possible groups names")
-    db_cursor.execute("SELECT groups._id, groups.title, groups.members, groups.recipient_id, thread._id FROM groups LEFT JOIN thread ON groups.recipient_id = thread.recipient_ids")
+    db_cursor.execute("SELECT groups._id, groups.title, groups.members, groups.recipient_id, thread._id FROM groups LEFT JOIN thread ON groups.recipient_id = thread.thread_recipient_id")
 
     groups = db_cursor.fetchall()
     for group in groups:
@@ -82,9 +82,9 @@ def fetch_contact(db_cursor, contact_name=None, _id=None):
 
 def fetch_group(db_cursor, group_name=None, _id=None):
   if group_name:
-    db_cursor.execute("SELECT groups._id, groups.title, groups.members, groups.recipient_id, thread._id FROM groups LEFT JOIN thread ON groups.recipient_id = thread.recipient_ids WHERE groups.title = ?", (group_name,))
+    db_cursor.execute("SELECT groups._id, groups.title, groups.members, groups.recipient_id, thread._id FROM groups LEFT JOIN thread ON groups.recipient_id = thread.thread_recipient_id WHERE groups.title = ?", (group_name,))
   elif _id:
-    db_cursor.execute("SELECT groups._id, groups.title, groups.members, groups.recipient_id, thread._id FROM groups LEFT JOIN thread ON groups.recipient_id = thread.recipient_ids WHERE groups._id = ?", (_id,))
+    db_cursor.execute("SELECT groups._id, groups.title, groups.members, groups.recipient_id, thread._id FROM groups LEFT JOIN thread ON groups.recipient_id = thread.thread_recipient_id WHERE groups._id = ?", (_id,))
   else:
     raise ValueError(f"{colors.FAIL}Please specify a name or an id")
 
@@ -122,10 +122,10 @@ def build_msg(sender, reciever, msg, msg_dict):
   reactions_css = ''
   if msg.reactions:
     reactions_css = REACTION_CSS.format(css=css, reactions=msg.reactions)
-  
+
   quote_css = ''
   filename_css = ''
-  if isinstance(msg, MMS): 
+  if isinstance(msg, MMS):
     if msg.quote_id:
       quoted_msg = msg_dict.get(msg.quote_id)
       assert(msg.quote_body is not None)
@@ -166,7 +166,7 @@ def backup_msg(output_dir, db_cursor, your_name, conv_name):
   if not contact:
     raise ValueError(f"{colors.FAIL}{conv_name} conversation does not exists")
 
-  CONTACT_DICT[contact.id] = contact 
+  CONTACT_DICT[contact.id] = contact
 
   msg_dict = OrderedDict(sorted(fetch_contact_msg(db_cursor, contact.thread_id).items()))
   if not msg_dict:
@@ -203,7 +203,7 @@ def backup_msg(output_dir, db_cursor, your_name, conv_name):
         pass
     else:
         pass
-  
+
   html_result.write(build_footer())
   html_result.close()
   generate_index(output_dir, months)
@@ -258,7 +258,7 @@ def move_attachment(db_cursor, output_dir, conv_name):
   used = fetch_part_used(db_cursor, contact.thread_id)
   for part in used:
     sys.stdout.write("Copying {}/{} attachments\r".format(used.index(part),len(used)-1))
-    
+
     file_to_move = ATTACHMENT_DIR + add_file_extension(part)
     att_out = output_dir + ATTACHMENT_DIR
     try:
